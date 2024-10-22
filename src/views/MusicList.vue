@@ -40,7 +40,7 @@ const [showAutoFixer, AutoFixerPop] = usePopcon();
       </button>
     </div>
   </div>
-  <div class="p-2">
+  <div class="p-2 flex-1 overflow-y-auto">
     <template v-for="item in list" :key="item.path">
       <div
         class="px-2 cursor-pointer text-sm rounded"
