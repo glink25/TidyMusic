@@ -29,9 +29,6 @@ dependencies:
   mime-types:
     specifier: ^2.1.35
     version: 2.1.35
-  mp3tag.js:
-    specifier: ^3.11.0
-    version: 3.11.0
   music-metadata:
     specifier: ^10.5.0
     version: 10.5.0
@@ -40,12 +37,21 @@ dependencies:
     version: 3.5.12(typescript@5.6.3)
 
 devDependencies:
+  '@iconify-json/material-symbols':
+    specifier: ^1.2.5
+    version: 1.2.5
   '@tauri-apps/cli':
     specifier: '>=2.0.0'
     version: 2.0.2
   '@types/mime-types':
     specifier: ^2.1.4
     version: 2.1.4
+  '@types/node':
+    specifier: ^22.7.7
+    version: 22.7.7
+  '@unocss/preset-icons':
+    specifier: ^0.63.4
+    version: 0.63.4
   '@unocss/transformer-directives':
     specifier: ^0.63.4
     version: 0.63.4
@@ -60,7 +66,7 @@ devDependencies:
     version: 0.63.4(postcss@8.4.47)(vite@5.4.8)
   vite:
     specifier: ^5.3.1
-    version: 5.4.8
+    version: 5.4.8(@types/node@22.7.7)
   vue-tsc:
     specifier: ^2.0.22
     version: 2.1.6(typescript@5.6.3)
@@ -532,6 +538,12 @@ packages:
     dev: true
     optional: true
 
+  /@iconify-json/material-symbols@1.2.5:
+    resolution: {integrity: sha512-CXG4noUsqBrbr0npZVldxlf8XGUW3LF3VEGvgk/2k+A3GQt/DM/04PsbjkO2wOI/ORP8rcaHz2pw8F2TPL+CKA==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: true
+
   /@iconify/types@2.0.0:
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
     dev: true
@@ -876,6 +888,12 @@ packages:
     resolution: {integrity: sha512-lfU4b34HOri+kAY5UheuFMWPDOI+OPceBSHZKp69gEyTL/mmJ4cnU6Y/rlme3UL3GyOn6Y42hyIEw0/q8sWx5w==}
     dev: true
 
+  /@types/node@22.7.7:
+    resolution: {integrity: sha512-SRxCrrg9CL/y54aiMCG3edPKdprgMVGDXjA3gB8UmmBW5TcXzRUYAh8EWzTnSJFAd1rgImPELza+A3bJ+qxz8Q==}
+    dependencies:
+      undici-types: 6.19.8
+    dev: true
+
   /@unocss/astro@0.63.4(vite@5.4.8):
     resolution: {integrity: sha512-qu1uMDUT8lXU3mm5EjZpnizvjSYtfY0TTDivR5QNm1i3Xd+ErHfdfOpXdJ2mYvxv+X7C570//KUugkTI3Mb3kQ==}
     peerDependencies:
@@ -887,7 +905,7 @@ packages:
       '@unocss/core': 0.63.4
       '@unocss/reset': 0.63.4
       '@unocss/vite': 0.63.4(vite@5.4.8)
-      vite: 5.4.8
+      vite: 5.4.8(@types/node@22.7.7)
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -1072,7 +1090,7 @@ packages:
       chokidar: 3.6.0
       magic-string: 0.30.12
       tinyglobby: 0.2.9
-      vite: 5.4.8
+      vite: 5.4.8(@types/node@22.7.7)
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -1085,7 +1103,7 @@ packages:
       vite: ^5.0.0
       vue: ^3.2.25
     dependencies:
-      vite: 5.4.8
+      vite: 5.4.8(@types/node@22.7.7)
       vue: 3.5.12(typescript@5.6.3)
     dev: true
 
@@ -1583,10 +1601,6 @@ packages:
       ufo: 1.5.4
     dev: true
 
-  /mp3tag.js@3.11.0:
-    resolution: {integrity: sha512-CSWc+OClkOYKRdDODCEA5nILWNHItsqcJNhHeE1nlBKjgbFdvARen31ECt7Zh/40Y7ukfCSiHyTcQRrQv5C5Hg==}
-    dev: false
-
   /mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
     engines: {node: '>=10'}
@@ -1830,6 +1844,10 @@ packages:
       - supports-color
     dev: true
 
+  /undici-types@6.19.8:
+    resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
+    dev: true
+
   /unocss@0.63.4(postcss@8.4.47)(vite@5.4.8):
     resolution: {integrity: sha512-MQ/ktuJ2MoXBsd117DEONFubJRQN6Og4mQJLbT+0nna2aTW4jYJESJ479mJYWq/ajonxEaM+zrf8M92VIWxzEw==}
     engines: {node: '>=14'}
@@ -1859,14 +1877,14 @@ packages:
       '@unocss/transformer-directives': 0.63.4
       '@unocss/transformer-variant-group': 0.63.4
       '@unocss/vite': 0.63.4(vite@5.4.8)
-      vite: 5.4.8
+      vite: 5.4.8(@types/node@22.7.7)
     transitivePeerDependencies:
       - postcss
       - rollup
       - supports-color
     dev: true
 
-  /vite@5.4.8:
+  /vite@5.4.8(@types/node@22.7.7):
     resolution: {integrity: sha512-FqrItQ4DT1NC4zCUqMB4c4AZORMKIa0m8/URVCZ77OZ/QSNeJ54bU1vrFADbDsuwfIPcgknRkmqakQcgnL4GiQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -1897,6 +1915,7 @@ packages:
       terser:
         optional: true
     dependencies:
+      '@types/node': 22.7.7
       esbuild: 0.21.5
       postcss: 8.4.47
       rollup: 4.24.0

@@ -17,7 +17,7 @@ const load = async () => {
   loading.show();
   try {
     const source = createNeteaseSource();
-    const results = await source.findList(props.input);
+    const results = await source.findLyrics(props.input);
     searchResults.value = results;
   } catch (error) {
     toasts.error(`${error}`);
@@ -35,21 +35,17 @@ const toApply = (result: any) => {
   <div ref="loadingRef" class="overflow-hidden h-full flex flex-col">
     <div class="h-8 p-2">Search Results:</div>
     <div class="flex-1 min-w-[300px] w-[80vw] max-w[500px] flex flex-col overflow-y-auto">
-      <div v-for="(result, index) in searchResults" :key="index" class="flex p-2">
-        <div class="flex flex-1 gap-2">
-          <img :src="result.cover" width="48" height="48" />
-          <div class="flex flex-col gpa-2">
-            <div class="text-sm font-semibold">{{ result.title }}</div>
-            <div class="flex flex-col text-xs text-black text-opacity-80">
-              <div>artist: {{ result.artist }}</div>
-              <div>album: {{ result.album }}</div>
-            </div>
+      <template v-for="(result, index) in searchResults" :key="index">
+        <div class="flex p-2 gap-2 items-center">
+          <div class="h-20 rounded border p-1 overflow-y-auto whitespace-pre">
+            {{ result.lyric }}
+          </div>
+          <div class="flex-shrink-0">
+            <button class="button" @click="toApply(result)">Use this</button>
           </div>
         </div>
-        <div>
-          <button class="button" @click="toApply(result)">Use this</button>
-        </div>
-      </div>
+        <hr />
+      </template>
     </div>
   </div>
   <!-- <LoadingWrapper /> -->

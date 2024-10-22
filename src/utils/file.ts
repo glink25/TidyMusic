@@ -1,9 +1,8 @@
 import { lookup } from "mime-types";
-import { fetch as nativeFetch } from '@tauri-apps/plugin-http';
-import { invoke } from "@tauri-apps/api/core";
+import { fetch as nativeFetch } from "@tauri-apps/plugin-http";
 
 export const fetchFileWithMimeType = async (url: string): Promise<{ content: ArrayBuffer; mimeType: string }> => {
-    const nowFetch = url.startsWith('blob:') ? fetch :nativeFetch
+  const nowFetch = ["blob:", "asset:"].some((pre) => url.startsWith(pre)) ? fetch : nativeFetch;
   // 使用 fetch 来获取文件
   const response = await nowFetch(url);
 
@@ -26,53 +25,35 @@ export const fetchFileWithMimeType = async (url: string): Promise<{ content: Arr
   return { content, mimeType };
 };
 
-
-export function downloadFile(blob: Blob, fileName: string) {
-    // 创建一个 URL 对象，指向 Blob 数据
-    const url = URL.createObjectURL(blob);
-    
-    // 创建一个 a 标签用于下载
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName; // 设置下载的文件名
-    
-    // 将 a 标签插入到页面并触发点击事件
-    document.body.appendChild(a);
-    a.click();
-    
-    // 下载完成后移除 URL 和 a 标签
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url); // 释放 Blob URL
-    }, 0);
-  }
-  
-
-  interface Metadata {
-    title?: string;
-    artist?: string;
-    album?: string;
-    year?: string;
-    lyrics?: string;
-  }
-  
-  export const updateMetadata = async (fileBuffer:ArrayBuffer,metadata:Metadata,coverBuffer:ArrayBuffer) => {
-    const fileData = Array.from(new Uint8Array(fileBuffer))
-    console.log(fileData,"fildata")
-    const response = await invoke<ArrayBuffer>('update_metadata', {
-        payload: {
-          file_data: fileData,
-          metadata:{
-            title:undefined,
-            artist:undefined,
-            album:undefined,
-            year:undefined,
-            lyrics:undefined,
-            ...metadata
-          },
-          cover_data: coverBuffer ? Array.from(new Uint8Array(coverBuffer)) : null,
-        },
-      });
-      const blob = new Blob([new Uint8Array(response)]);
-      return blob
+export const pickFileBrowser = ({ multiple, accept }: { multiple: boolean; accept: string }) => {
+  const input = document.createElement("input");
+  input.multiple = multiple;
+  input.type = "file";
+  input.accept = accept;
+  input.style.position = "fixed";
+  // input.style.width = "0";
+  // input.style.height = "0";
+  // input.style.top = "-1000px";
+  // input.style.left = "-1000px";
+  // input.style.opacity = "0";
+  const clean = () => {
+    input.remove();
   };
+  return new Promise<FileList>((resolve, reject) => {
+    input.addEventListener("change", () => {
+      const files = input.files;
+      if (!files || files.length === 0) {
+        reject();
+        clean();
+        return;
+      }
+      resolve(files);
+      clean();
+    });
+    document.body.appendChild(input);
+    input.click();
+    // setTimeout(() => {
+    //   clean();
+    // }, 10);
+  });
+};

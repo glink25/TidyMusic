@@ -1,5 +1,5 @@
 import { IAudioMetadata, ITag, selectCover } from "music-metadata";
-import { fetchFileWithMimeType } from "./file";
+import { fetchFileWithMimeType } from "@/utils/file";
 import { ID3Writer } from "browser-id3-writer";
 
 export enum MusicTagFormat {
@@ -9,18 +9,15 @@ export enum MusicTagFormat {
   // genre,
 }
 
-export const CommmonTags = [
+export const CommonTags = [
   {
     label: "title",
     format: MusicTagFormat.text,
     getValue: async (tag: IAudioMetadata) => tag.common.title,
-    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any):Promise<ITag|undefined> => {
-      if (value === undefined) {
-        return
-      }
+    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
       return {
-        id:'TIT2',
-        value
+        id: "TIT2",
+        value,
       };
     },
   },
@@ -28,13 +25,10 @@ export const CommmonTags = [
     label: "artist",
     format: MusicTagFormat.text,
     getValue: async (tag: IAudioMetadata) => tag.common.artist,
-    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any):Promise<ITag|undefined> => {
-      if (value === undefined) {
-        return;
-      }
+    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
       return {
-        id:'TPE1',
-        value:[value]
+        id: "TPE1",
+        value: [value],
       };
     },
   },
@@ -42,14 +36,31 @@ export const CommmonTags = [
     label: "album",
     format: MusicTagFormat.text,
     getValue: async (tag: IAudioMetadata) => tag.common.album,
-    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any):Promise<ITag|undefined> => {
+    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
+      return {
+        id: "TALB",
+        value,
+      };
+    },
+  },
+  {
+    label: "comment",
+    format: MusicTagFormat.text,
+    getValue: async (tag: IAudioMetadata) => tag.common.comment?.[0]?.text,
+    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
       if (value === undefined) {
-        return;
+        return {
+          id: "COMM",
+          value,
+        };
       }
       return {
-        id:'TALB',
-        value
-      }
+        id: "COMM",
+        value: {
+          description: "",
+          text: value,
+        },
+      };
     },
   },
   {
@@ -66,41 +77,47 @@ export const CommmonTags = [
       const url = URL.createObjectURL(blob);
       return url;
     },
-    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any):Promise<ITag|undefined> => {
+    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
       if (value === undefined) {
-        return;
+        return {
+          id: "APIC",
+          value: undefined,
+        };
       }
       const { content } = await fetchFileWithMimeType(value ?? curValue);
-      if(value.startsWith('blob:') && value!==curValue){
-        URL.revokeObjectURL(value)
+      if (value.startsWith("blob:") && value !== curValue) {
+        URL.revokeObjectURL(value);
       }
       // const mime = originMime.includes('jpg') ? 'image/jpeg' :originMime
       return {
-        id:'APIC',
-        value:{
-          description:'',
-          type:3,
-          data:content
-        }
-      }
+        id: "APIC",
+        value: {
+          description: "",
+          type: 3,
+          data: content,
+        },
+      };
     },
   },
   {
     label: "lyric",
     format: MusicTagFormat.lyric,
     getValue: async (tag: IAudioMetadata) => tag.common.lyrics?.[0].text,
-    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any):Promise<ITag|undefined> => {
+    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
       if (value === undefined) {
-        return;
+        return {
+          id: "USLT",
+          value: undefined,
+        };
       }
       return {
-        id:"USLT",
-        value:{
+        id: "USLT",
+        value: {
           description: "",
           language: "",
           lyrics: value,
-        }
-      }
+        },
+      };
     },
   },
   // {
@@ -115,14 +132,14 @@ export const CommmonTags = [
   // },
 ] as const;
 
-export type CommonTagLabel = (typeof CommmonTags)[number]["label"];
+export type CommonTagLabel = (typeof CommonTags)[number]["label"];
 
-type Item = (typeof CommmonTags)[number];
+type Item = (typeof CommonTags)[number];
 
 export type CommonTagValue<K extends CommonTagLabel> = Awaited<ReturnType<Extract<Item, { label: K }>["getValue"]>>;
 
 export type CommonTag = { [k in CommonTagLabel]: CommonTagValue<k> };
 
-export const CommmonTagLabels = CommmonTags.map((t) => t.label) as CommonTagLabel[];
+export const CommonTagLabels = CommonTags.map((t) => t.label) as CommonTagLabel[];
 
 export const isMusic = (name: string) => [".mp3", ".acc"].some((ext) => name.toLowerCase().endsWith(ext));

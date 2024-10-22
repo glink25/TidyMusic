@@ -1,94 +1,222 @@
 <script lang="ts" setup>
-import { EditableMusic, useMusicList } from '../composables/useMusicList';
-import { CommonTag } from '../utils/music';
-import { useConfirm } from '../ui/confirm';
-import Source from "./Source.vue";
-import { reactive, watchEffect } from 'vue';
-import abortable from '../utils/abort';
-import { saveFile } from '../utils/fs';
-import { toasts } from '../composables/useToast';
-import { loadings } from '../composables/useGlobalLoading';
+import { useMusicList } from "@/composables/useMusicList";
+import { CommonTag } from "@/utils/music";
+import { useAlert, usePopcon } from "@/ui/popcon";
+import Source from "@/views/Source.vue";
+import { computed, reactive, ref, watch } from "vue";
+import abortable from "@/utils/abort";
+import { toasts } from "@/composables/useToast";
+import { loadings } from "@/composables/useGlobalLoading";
+import Song from "@/utils/song";
+import { saveFile } from "@/utils/fs";
+import SingleImagePicker from "@/components/SingleImagePicker.vue";
+import Tooltip from "@/components/Tooltip.vue";
+import WordSplitter from "@/components/WordSplitter.vue";
+import LyricSource from "./LyricSource.vue";
 
-const { selected } = useMusicList()
-let originalTags: Record<string, any> | undefined
-const getTag = async (v?: EditableMusic) => {
-    if (!v) return {}
-    const tags = await v.tags()
-    originalTags = tags
-    const transformed = Object.fromEntries(tags.map((t) => [t.label, t.value])) as Record<string, any>
-    originalTags = transformed
-    return transformed
-}
+const { selected, beforeSelectChange } = useMusicList();
+let originalTags: Record<string, any> | undefined;
+const getTag = async (v?: Song) => {
+  if (!v) return {};
+  const tags = await v.getTags();
+  originalTags = tags;
+  const transformed = Object.fromEntries(tags.map((t) => [t.label, t.value])) as Record<string, any>;
+  originalTags = transformed;
+  return transformed;
+};
 
-const inner = reactive<Partial<CommonTag>>({})
-watchEffect((onCleanUp) => {
-    const [promise, cancel] = abortable(getTag(selected.value))
-    promise.then((v) => {
-        Object.assign(inner, v)
-    })
-    onCleanUp(() => {
-        cancel()
-    })
-})
+const inner = reactive<Partial<CommonTag>>({});
+const isInnerDirty = ref(false);
+const notifyChange = () => {
+  isInnerDirty.value = true;
+};
+watch(selected, (_o, _n, onCleanUp) => {
+  const [promise, cancel] = abortable(getTag(selected.value));
+  promise.then((v) => {
+    Object.assign(inner, v);
+    isInnerDirty.value = false;
+  });
+  onCleanUp(() => {
+    cancel();
+  });
+});
+
+const [alert, AlertWrapper] = useAlert();
+beforeSelectChange(async () => {
+  if (isInnerDirty.value) {
+    const leave = await alert({
+      title: "Changed not saved, Are you sure to leave?",
+      options: ["Still leave", "Cancel"],
+    });
+    return leave;
+  }
+  return true;
+});
+
 const isEmpty = (v: any) => {
-    return Object.keys(v).length === 0 || Object.values(v).every(v => v === undefined || v === null || v === '')
-}
+  return (
+    v === undefined ||
+    v === null ||
+    Object.keys(v).length === 0 ||
+    Object.values(v).every((v) => v === undefined || v === null || v === "")
+  );
+};
 
-const [showConfirm, Popcon] = useConfirm<Partial<CommonTag>, Partial<CommonTag>>()
+const [showSourcePop, SourcePop] = usePopcon<Partial<CommonTag>, Partial<CommonTag>>();
 
+const canSearchOnline = computed(() => !isEmpty(inner));
 const toSearchOnline = async () => {
-    if (isEmpty(inner)) return
-    const params = inner
-    const newTag = await showConfirm(params)
-    console.log(newTag, "newTag", newTag.cover)
-    if (!newTag) {
-        return
-    }
-    Object.assign(inner, newTag)
-}
+  if (!canSearchOnline.value) return;
+  const params = inner;
+  const newTag = await showSourcePop(params);
+  if (!newTag) {
+    return;
+  }
+  console.log("online tag", newTag);
+  Object.assign(inner, newTag);
+  notifyChange();
+};
+
+const [showLyricSourcePop, LyricSourcePop] = usePopcon<Partial<{ lyric: string }>, Partial<CommonTag>>();
+
+// const canSearchOnline = computed(() => !isEmpty(inner));
+const toSearchLyricOnline = async () => {
+  if (!canSearchOnline.value) return;
+  const params = inner;
+  const newLyric = await showLyricSourcePop(params);
+  if (!newLyric) {
+    return;
+  }
+  console.log("online lyric", newLyric);
+  inner.lyric = newLyric.lyric;
+  notifyChange();
+};
 
 const toReset = () => {
-    if (!originalTags) {
-        return
-    }
-    Object.assign(inner, originalTags)
-}
+  toasts.success("Rest success");
+  if (!originalTags) {
+    return;
+  }
+  Object.assign(inner, originalTags);
+  isInnerDirty.value = false;
+};
 const toSave = async () => {
-    const song = selected.value
-    if (!song) return
-    loadings.show()
-    const newBuffer = await song.update(inner)
-    await saveFile(song.path, newBuffer)
-    loadings.dismiss()
-    toasts.show("save success")
-    console.log("save success")
-}
+  const song = selected.value;
+  if (!song) return;
+  loadings.show();
+  try {
+    const newBuffer = await song.update(inner);
+    await saveFile(song.path, newBuffer);
+    isInnerDirty.value = false;
+    toasts.success("save success");
+  } catch (error) {
+    console.error(error);
+    toasts.error(`save failed: ${error}`);
+  } finally {
+    loadings.dismiss();
+  }
+};
 
+// useGlobalBackground(() => inner.cover)
 </script>
 <template>
-    <template v-if="selected">
-        <div class="w-full flex gap-2">
-            <button @click="toSearchOnline">search online</button>
-            <button @click="toReset">Reset</button>
-            <button @click="toSave">Save</button>
+  <template v-if="selected">
+    <div class="w-full flex gap-2 px-2 pt-2 justify-between">
+      <button class="icon-button" :disabled="!canSearchOnline" @click="toSearchOnline" title="search online">
+        <div class="i-md:screen-search-desktop-outline-rounded"></div>
+      </button>
+      <div class="flex gap-2">
+        <button class="icon-button" :disabled="!isInnerDirty" @click="toReset" title="reset">
+          <div class="i-md:refresh"></div>
+        </button>
+        <button class="icon-button" :disabled="!isInnerDirty" @click="toSave" title="save">
+          <div class="i-md:save-outline-rounded"></div>
+        </button>
+      </div>
+    </div>
+    <div class="w-full flex-1 overflow-y-auto flex p-2">
+      <div class="w-full flex flex-col items-center gap-2 text-sm">
+        <div class="song-form-item">
+          <div>Cover:</div>
+          <SingleImagePicker v-model="inner.cover" @change="notifyChange" class="!w-[150px] h-[150px]" />
         </div>
-        <div class="w-full flex-1 overflow-y-auto flex">
-            <div>
-                <img v-if="inner.cover" :src="inner.cover" alt="" width="64" height="64">
-                <div>
-                    <div>Title:</div><input v-model="inner.title" />
-                </div>
-
-                <div>
-                    <div>Artist:</div><input v-model="inner.artist" />
-                </div>
-                <textarea v-model="inner.lyric" />
-            </div>
+        <div class="song-form-item">
+          <div>Title:</div>
+          <Tooltip direction="top">
+            <input v-model="inner.title" @change="notifyChange" class="w-full rounded" />
+            <template #tooltip>
+              <WordSplitter
+                :text="selected.name"
+                @select="
+                  (v) => {
+                    inner.title = (inner.title ?? '') + v;
+                  }
+                " />
+            </template>
+          </Tooltip>
         </div>
+        <div class="song-form-item">
+          <div>Artist:</div>
+          <Tooltip direction="top">
+            <input v-model="inner.artist" @change="notifyChange" class="w-full rounded" />
+            <template #tooltip>
+              <WordSplitter
+                :text="selected.name"
+                @select="
+                  (v) => {
+                    inner.artist = (inner.artist ?? '') + v;
+                  }
+                " />
+            </template>
+          </Tooltip>
+        </div>
+        <div class="song-form-item">
+          <div>Album:</div>
+          <Tooltip direction="top">
+            <input v-model="inner.album" @change="notifyChange" class="w-full rounded" />
+            <template #tooltip>
+              <WordSplitter
+                :text="selected.name"
+                @select="
+                  (v) => {
+                    inner.album = (inner.album ?? '') + v;
+                  }
+                " />
+            </template>
+          </Tooltip>
+        </div>
+        <div class="song-form-item">
+          <div>Lyrics:</div>
+          <textarea v-model="inner.lyric" @change="notifyChange" class="h-[150px] resize-none" />
+        </div>
+        <div class="song-form-item">
+          <div>Comment:</div>
+          <input v-model="inner.comment" @change="notifyChange" class="w-full rounded" />
+          <button class="button" @click="toSearchLyricOnline">search lyric</button>
+        </div>
+      </div>
+    </div>
+  </template>
+  <SourcePop>
+    <template #default="binded">
+      <Source v-bind="binded" />
     </template>
-    <Popcon>
-        <template #default="binded">
-            <Source v-bind="binded" />
-        </template>
-    </Popcon>
+  </SourcePop>
+  <LyricSourcePop>
+    <template #default="binded">
+      <LyricSource v-bind="binded" />
+    </template>
+  </LyricSourcePop>
+  <AlertWrapper />
 </template>
+
+<style scoped>
+.song-form-item {
+  @apply w-full flex flex-col justify-center items-center gap-1 [&>:first-child]:(text-gray text-xs text-right) [&>:nth-child(2)]:(rounded min-w-[150px] w-[50%] max-w[220px]);
+}
+
+input,
+textarea {
+  @apply text-center p-1 bg-[rgba(0,0,0,0.1)];
+}
+</style>

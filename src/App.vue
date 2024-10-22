@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import MusicList from './views/MusicList.vue';
-import Details from './views/Details.vue';
-import { LoadingWrapper } from './composables/useGlobalLoading';
-import { ToastWrapper } from './composables/useToast';
-
+import MusicList from "@/views/MusicList.vue";
+import Details from "@/views/Details.vue";
+import { LoadingWrapper } from "@/composables/useGlobalLoading";
+import { ToastWrapper } from "@/composables/useToast";
 </script>
 
 <template>
   <div class="flex w-full h-full">
-    <div class="flex-1 min-w-[200px] h-full border-r">
+    <div
+      class="flex-1 min-w-[240px] h-full backdrop-blur-lg bg-white bg-opacity-10 shadow-[1px_0px_1px_rgba(0,0,0,0.1)]">
       <MusicList />
     </div>
     <div class="flex-[70%] h-full flex flex-col">
@@ -18,19 +18,3 @@ import { ToastWrapper } from './composables/useToast';
   <ToastWrapper />
   <LoadingWrapper />
 </template>
-
-<style>
-body {
-  width: 100vw;
-  height: 100vh;
-}
-
-#app {
-  width: 100%;
-  height: 100%;
-}
-
-.buttoned {
-  @apply rounded bg-gray
-}
-</style>

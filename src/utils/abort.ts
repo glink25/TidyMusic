@@ -1,12 +1,25 @@
+class CancelError extends Error {
+  constructor() {
+    super("Promise aborted");
+  }
+}
+export default function abortable<T>(promise: Promise<T>) {
+  let _rej: ((err: any) => void) | undefined = undefined;
+  const abortable = new Promise((res, rej) => {
+    _rej = rej;
+    return promise
+      .then((v) => {
+        res(v);
+      })
+      .catch((err) => {
+        if (err instanceof CancelError) {
+          console.warn(err);
+          return;
+        }
+        return Promise.reject(err);
+      });
+  });
+  const abort = () => _rej?.(new CancelError());
 
-
-export default function abortable<T>(promise:Promise<T>) {
-    let _rej:((err:any)=>void)|undefined = undefined
-    const abortable  =new Promise((res,rej)=>{
-        _rej = rej
-        promise.then(res).catch(rej)
-    })
-    const abort = ()=>_rej?.('Promise aborted')
-
-    return [abortable,abort] as const
+  return [abortable, abort] as const;
 }

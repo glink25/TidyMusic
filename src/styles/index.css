@@ -1,0 +1,22 @@
+body {
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  #app {
+    @apply w-full h-full bg-white bg-opacity-20 backdrop-blur-2xl
+  }
+  
+  .button {
+    @apply shadow-sm rounded-md px-1 border text-sm bg-white 
+    disabled:(opacity-60 cursor-not-allowed) 
+    not-disabled:active:(brightness-90)
+    data-[type=primary]:not-disabled:(bg-primary text-white)
+  }
+
+  .icon-button{
+    @apply text-[rgba(116,115,115,1)] rounded p-1 bg-transparent transition-all 
+    not-disabled:hover:(bg-[rgba(0,0,0,0.1)]) not-disabled:active:(bg-[rgba(0,0,0,0.2)])
+    [&>div]:(w-[20px] h-[20px])
+    disabled:(opacity-20 cursor-not-allowed)
+  }

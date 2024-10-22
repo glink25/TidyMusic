@@ -8,16 +8,9 @@ export type OpenedFile = {
   data: () => Promise<Uint8Array>;
 } & DirEntry;
 
-const recursiveReadDir = async (
-  dir: string,
-  handler: (file: OpenedFile) => Promise<any>
-): Promise<any> => {
+const recursiveReadDir = async (dir: string, handler: (file: OpenedFile) => Promise<any>): Promise<any> => {
   const entries = await readDir(dir, { baseDir: BaseDirectory.AppLocalData });
-  console.log("readdir:", dir, entries);
-
-  //   return Promise.allSettled(
-
-  //   );
+  // console.log("readdir:", dir, entries);
   return await Promise.allSettled(
     entries.map(async (entry) => {
       const fullpath = await join(dir, entry.name);
@@ -25,8 +18,7 @@ const recursiveReadDir = async (
         return await recursiveReadDir(fullpath, handler);
       }
       if (entry.isFile) {
-        console.log("readfile:", fullpath);
-        // const file = await readFile(fullpath);
+        // console.log("readfile:", fullpath);
         return await handler({
           ...entry,
           fullpath,
@@ -37,20 +29,28 @@ const recursiveReadDir = async (
   );
 };
 
-export const recursiveOpen = async (
-  handler: (file: OpenedFile) => Promise<any>
-) => {
+export const recursiveOpen = async (handler: (file: OpenedFile) => Promise<any>) => {
   const folder = await open({ directory: true });
   if (!folder) return;
-  return await recursiveReadDir(folder, handler).catch((err) =>
-    console.log(err)
-  );
+  return await recursiveReadDir(folder, handler).catch((err) => console.error(err));
 };
 
-export const saveFile  =async (path:string,buffer:any)=>{
-  return await writeFile(path,buffer)
-}
+export const saveFile = async (path: string, buffer: any) => {
+  return await writeFile(path, buffer);
+};
 
-export const saveFileToDownloadFolder  =async (name:string,buffer:any)=>{
-  return await writeFile(name,buffer,{baseDir:BaseDirectory.Download})
-}
+export const saveFileToDownloadFolder = async (name: string, buffer: any) => {
+  return await writeFile(name, buffer, { baseDir: BaseDirectory.Download });
+};
+
+export const pickFile = async <M extends boolean>({ multiple, accept }: { multiple: M; accept: string[] }) => {
+  const files = await open({
+    multiple: multiple,
+    filters: [{ name: "file", extensions: accept }],
+  });
+  if (!files) {
+    throw new Error("no file select");
+  }
+  // return await Promise.all([files].flat().map((f) => readFile(f)));
+  return [files].flat().map((v) => convertFileSrc(v));
+};
