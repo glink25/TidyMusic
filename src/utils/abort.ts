@@ -16,7 +16,8 @@ export default function abortable<T>(promise: Promise<T>) {
           console.warn(err);
           return;
         }
-        return Promise.reject(err);
+        rej(err);
+        return err;
       });
   });
   const abort = () => _rej?.(new CancelError());

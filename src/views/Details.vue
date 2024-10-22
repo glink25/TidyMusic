@@ -27,15 +27,28 @@ const getTag = async (v?: Song) => {
 
 const inner = reactive<Partial<CommonTag>>({});
 const isInnerDirty = ref(false);
+const isLoadFailed = ref(false);
 const notifyChange = () => {
   isInnerDirty.value = true;
 };
 watch(selected, (_o, _n, onCleanUp) => {
   const [promise, cancel] = abortable(getTag(selected.value));
-  promise.then((v) => {
-    Object.assign(inner, v);
-    isInnerDirty.value = false;
-  });
+  promise
+    .then((v) => {
+      Object.assign(inner, v);
+      isLoadFailed.value = false;
+    })
+    .catch((err) => {
+      console.error(err);
+      Object.keys(inner).forEach((k) => {
+        (inner as any)[k] = undefined;
+      });
+      isLoadFailed.value = true;
+      toasts.error(err);
+    })
+    .finally(() => {
+      isInnerDirty.value = false;
+    });
   onCleanUp(() => {
     cancel();
   });
@@ -105,7 +118,20 @@ const toSave = async () => {
   if (!song) return;
   loadings.show();
   try {
-    const newBuffer = await song.update(inner);
+    const [canSafeUpdate, next, diffs] = await song.update(inner);
+    if (!canSafeUpdate) {
+      loadings.dismiss();
+      console.log("diffs:", diffs);
+      const conti = await alert({
+        title: "Some tag will be override, still continue?",
+        subtitle: `These tags will be removed or replaced: ${diffs.map((v) => `${v.id}`).join(", ")}`,
+        options: ["Continue", "Cancel"],
+      });
+      if (!conti) {
+        return;
+      }
+    }
+    const newBuffer = await next();
     await saveFile(song.path, newBuffer);
     isInnerDirty.value = false;
     toasts.success("save success");
@@ -121,7 +147,7 @@ const toSave = async () => {
 </script>
 <template>
   <template v-if="selected">
-    <div class="w-full flex gap-2 px-2 pt-2 justify-between">
+    <div class="w-full flex gap-2 p-2 justify-between border-b">
       <button class="icon-button" :disabled="!canSearchOnline" @click="toSearchOnline" title="search online">
         <div class="i-md:screen-search-desktop-outline-rounded"></div>
       </button>
@@ -135,7 +161,7 @@ const toSave = async () => {
       </div>
     </div>
     <div class="w-full flex-1 overflow-y-auto flex p-2">
-      <div class="w-full flex flex-col items-center gap-2 text-sm">
+      <div v-if="!isLoadFailed" class="w-full flex flex-col items-center gap-2 text-sm">
         <div class="song-form-item">
           <div>Cover:</div>
           <SingleImagePicker v-model="inner.cover" @change="notifyChange" class="!w-[150px] h-[150px]" />
@@ -150,6 +176,7 @@ const toSave = async () => {
                 @select="
                   (v) => {
                     inner.title = (inner.title ?? '') + v;
+                    notifyChange();
                   }
                 " />
             </template>
@@ -165,6 +192,7 @@ const toSave = async () => {
                 @select="
                   (v) => {
                     inner.artist = (inner.artist ?? '') + v;
+                    notifyChange();
                   }
                 " />
             </template>
@@ -180,6 +208,7 @@ const toSave = async () => {
                 @select="
                   (v) => {
                     inner.album = (inner.album ?? '') + v;
+                    notifyChange();
                   }
                 " />
             </template>
@@ -191,9 +220,14 @@ const toSave = async () => {
         </div>
         <div class="song-form-item">
           <div>Comment:</div>
-          <input v-model="inner.comment" @change="notifyChange" class="w-full rounded" />
+          <textarea v-model="inner.comment" @change="notifyChange" class="w-full rounded resize-none" />
+          <div class="text-[10px] text-gray">some source may use comment to store id</div>
           <button class="button" @click="toSearchLyricOnline">search lyric</button>
         </div>
+      </div>
+      <div v-else class="w-full flex-1 flex flex-col justify-center items-center">
+        <div class="i-md:error-outline-rounded w-[32px] h-[32px]"></div>
+        <div>Load music failed</div>
       </div>
     </div>
   </template>

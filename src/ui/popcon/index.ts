@@ -40,6 +40,7 @@ type AlertReturned<Option extends AlertOptions> = Option extends [string, string
   : string | undefined;
 export type AlertInput<Option extends AlertOptions = AlertOptions> = {
   title: string;
+  subtitle?: string;
   options: Option;
 };
 

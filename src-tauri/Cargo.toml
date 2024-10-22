@@ -26,4 +26,5 @@ tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
 tauri-plugin-http = "2"
 id3 = "1.14.0"
+tauri-plugin-store = "2"
 

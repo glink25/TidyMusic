@@ -59,30 +59,46 @@ export default class Song {
     const meta = await this.getMeta();
     const tags = await this.getTags();
     const writer = new ID3Writer(file);
-    const natives: ITag[] = [...(Object.values(meta.native)[0] ?? [])].filter((v) => validFrameNames.includes(v.id));
-    for await (const item of Object.entries(v)) {
-      const [label, value] = item;
-      const tag = tags?.find((c) => c.label === label);
-      const result = await tag?.setValue(value, writer, tag.value);
-      if (!result) {
-        continue;
+    // 兼容id-writer和music-metadata的格式转换
+    const originalNatives: ITag[] = [...(Object.values(meta.native)[0] ?? [])].map((v) => {
+      if (v.id === "TCON" || v.id === "TCOM") {
+        return {
+          ...v,
+          value: [v.value].flat(),
+        };
       }
-      const existedIndex = natives.findIndex((t) => t?.id === result?.id);
-      if (existedIndex !== -1) {
-        natives[existedIndex] = result;
-      } else {
-        natives.push(result);
-      }
-    }
-    natives.forEach((itag) => {
-      if (!itag || itag.value === undefined) return;
-      writer.setFrame(itag.id as any, itag.value as any);
+      return v;
     });
+    console.log("originalNatives", originalNatives);
+    const filteredNatives = originalNatives.filter((v) => validFrameNames.includes(v.id));
+    const canSafeUpdate = filteredNatives.length === originalNatives.length;
+    const diffs = originalNatives.filter((v) => filteredNatives.every((x) => x.id !== v.id));
+    const next = async () => {
+      for await (const item of Object.entries(v)) {
+        const [label, value] = item;
+        const tag = tags?.find((c) => c.label === label);
+        const result = await tag?.setValue(value, writer, tag.value);
+        if (!result) {
+          continue;
+        }
+        const existedIndex = filteredNatives.findIndex((t) => t?.id === result?.id);
+        if (existedIndex !== -1) {
+          filteredNatives[existedIndex] = result;
+        } else {
+          filteredNatives.push(result);
+        }
+      }
+      filteredNatives.forEach((itag) => {
+        if (!itag || itag.value === undefined) return;
+        writer.setFrame(itag.id as any, itag.value as any);
+      });
 
-    const buffer = writer.addTag();
-    this.clearCache();
-    this.file = async () => new Uint8Array(buffer);
-    return buffer;
+      const buffer = writer.addTag();
+      this.clearCache();
+      this.file = async () => new Uint8Array(buffer);
+      return buffer;
+    };
+    return [canSafeUpdate, next, diffs] as const;
   }
 
   private clearCache() {

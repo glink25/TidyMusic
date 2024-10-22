@@ -37,7 +37,7 @@ const toApply = (result: any) => {
     <div class="flex-1 min-w-[300px] w-[80vw] max-w[500px] flex flex-col overflow-y-auto">
       <template v-for="(result, index) in searchResults" :key="index">
         <div class="flex p-2 gap-2 items-center">
-          <div class="h-20 rounded border p-1 overflow-y-auto whitespace-pre">
+          <div class="flex-1 h-20 rounded border p-1 overflow-y-auto whitespace-pre">
             {{ result.lyric }}
           </div>
           <div class="flex-shrink-0">

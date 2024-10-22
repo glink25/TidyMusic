@@ -35,8 +35,8 @@ export const recursiveOpen = async (handler: (file: OpenedFile) => Promise<any>)
   return await recursiveReadDir(folder, handler).catch((err) => console.error(err));
 };
 
-export const saveFile = async (path: string, buffer: any) => {
-  return await writeFile(path, buffer);
+export const saveFile = async (path: string, buffer: Uint8Array | ArrayBuffer) => {
+  return await writeFile(path, buffer as any);
 };
 
 export const saveFileToDownloadFolder = async (name: string, buffer: any) => {

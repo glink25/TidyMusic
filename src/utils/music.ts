@@ -46,7 +46,7 @@ export const CommonTags = [
   {
     label: "comment",
     format: MusicTagFormat.text,
-    getValue: async (tag: IAudioMetadata) => tag.common.comment?.[0]?.text,
+    getValue: async (tag: IAudioMetadata) => tag.common.comment?.find((v) => v.text?.length)?.text,
     setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
       if (value === undefined) {
         return {
@@ -102,7 +102,12 @@ export const CommonTags = [
   {
     label: "lyric",
     format: MusicTagFormat.lyric,
-    getValue: async (tag: IAudioMetadata) => tag.common.lyrics?.[0].text,
+    getValue: async (tag: IAudioMetadata) => {
+      return (
+        tag.common.lyrics?.find((v) => v.text?.length)?.text ??
+        (tag.native?.["ID3v2.2"]?.find((v) => v.id === "ULT")?.value as any)?.text
+      );
+    },
     setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
       if (value === undefined) {
         return {
