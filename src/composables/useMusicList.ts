@@ -5,6 +5,7 @@ export const useMusicList = (() => {
   const addMusic = async (path: string, name: string, file: () => Promise<Uint8Array>) => {
     const index = list.value.findIndex((f) => f.path === path);
     const item = new Song(path, name, file);
+    await item.loadTags();
     if (index !== -1) {
       list.value[index] = item;
       return;

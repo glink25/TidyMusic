@@ -61,9 +61,17 @@ export default function useStorage<State extends object>(key: string, autoSave =
     });
     return ref;
   };
+
+  const reset = async () => {
+    Object.keys(state).forEach((v) => {
+      (state as any)[v] = undefined;
+    });
+    await store?.clear();
+  };
   return {
     state,
     createRef,
+    reset,
   };
 }
 
@@ -81,13 +89,22 @@ export type Settings = {
   appSettings: {
     overridesStrategy: OverridesStrategy;
     showInputHint: ShowInputHint;
+    showOverrideUnsupportedTagWarning: boolean;
   };
   autoFixerSettings: {};
 };
 export const useSettings = (() => {
-  const { createRef } = useStorage<Settings>("settings.json");
+  const { createRef, reset } = useStorage<Settings>("settings.json");
 
-  const overridesStrategy = createRef(["appSettings", "overridesStrategy"], OverridesStrategy.OverrideAll);
-  const showInputHint = createRef(["appSettings", "showInputHint"], ShowInputHint.Always);
-  return () => ({ overridesStrategy, showInputHint });
+  const overridesStrategy = createRef(
+    ["appSettings", "overridesStrategy"],
+    OverridesStrategy.OverrideAll as OverridesStrategy
+  );
+  const showInputHint = createRef(["appSettings", "showInputHint"], ShowInputHint.Always as ShowInputHint);
+
+  const showOverrideUnsupportedTagWarning = createRef(
+    ["appSettings", "showOverrideUnsupportedTagWarning"],
+    true as boolean
+  );
+  return () => ({ overridesStrategy, showInputHint, showOverrideUnsupportedTagWarning, reset });
 })();

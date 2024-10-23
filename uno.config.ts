@@ -9,6 +9,7 @@ export default defineConfig({
     presetIcons({
       collections: {
         md: () => loadJSON("node_modules/@iconify-json/material-symbols/icons.json"),
+        tb: () => loadJSON("node_modules/@iconify-json/tabler/icons.json"),
       },
     }),
     // ...other presets
@@ -16,6 +17,7 @@ export default defineConfig({
   theme: {
     colors: {
       primary: "var(--primary-color, #facc15)",
+      text: "rgba(116,115,115,1)",
     },
   },
 });

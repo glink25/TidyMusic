@@ -18,8 +18,14 @@ select {
 }
 
 .icon-button {
-  @apply text-[rgba(116,115,115,1)] rounded p-1 bg-transparent transition-all 
+  @apply text-text rounded p-1 bg-transparent transition-all 
     not-disabled:hover:(bg-[rgba(0,0,0,0.1)]) not-disabled:active:(bg-[rgba(0,0,0,0.2)])
-    [&>div]:(w-[20px] h-[20px])
-    disabled:(opacity-20 cursor-not-allowed);
+    disabled:(opacity-20 cursor-not-allowed)
+}
+ .icon-button[data-size="small"]{
+  @apply [&>div]:(w-[14px] h-[14px])
+}
+
+.icon-button[data-size="large"]{
+  @apply [&>div]:(w-[20px] h-[20px])
 }

@@ -13,6 +13,10 @@ import SingleImagePicker from "@/components/SingleImagePicker.vue";
 import Tooltip from "@/components/Tooltip.vue";
 import WordSplitter from "@/components/WordSplitter.vue";
 import LyricSource from "./LyricSource.vue";
+import { OverridesStrategy, ShowInputHint, useSettings } from "@/composables/useStorage";
+
+const { overridesStrategy, showInputHint, showOverrideUnsupportedTagWarning } = useSettings();
+const showHint = (v: any) => (showInputHint.value === ShowInputHint.Always ? true : v === "" || v === undefined);
 
 const { selected, beforeSelectChange } = useMusicList();
 let originalTags: Record<string, any> | undefined;
@@ -86,7 +90,16 @@ const toSearchOnline = async () => {
     return;
   }
   console.log("online tag", newTag);
-  Object.assign(inner, newTag);
+  Object.entries(newTag).forEach(<K extends keyof typeof newTag>(p: any) => {
+    const [k, v] = p as [K, (typeof newTag)[K]];
+    const old = inner[k];
+    if (overridesStrategy.value === OverridesStrategy.EmptyOnly) {
+      if (old !== undefined || old !== "") {
+        return;
+      }
+    }
+    inner[k] = v;
+  });
   notifyChange();
 };
 
@@ -119,16 +132,20 @@ const toSave = async () => {
   loadings.show();
   try {
     const [canSafeUpdate, next, diffs] = await song.update(inner);
-    if (!canSafeUpdate) {
+    if (!canSafeUpdate && showOverrideUnsupportedTagWarning.value) {
       loadings.dismiss();
       console.log("diffs:", diffs);
+      const options = ["Continue", "Cancel", "Continue and don't show again"];
       const conti = await alert({
         title: "Some tag will be override, still continue?",
         subtitle: `These tags will be removed or replaced: ${diffs.map((v) => `${v.id}`).join(", ")}`,
-        options: ["Continue", "Cancel"],
+        options,
       });
-      if (!conti) {
+      if (!conti || conti === options[1]) {
         return;
+      }
+      if (conti === options[2]) {
+        showOverrideUnsupportedTagWarning.value = false;
       }
     }
     const newBuffer = await next();
@@ -148,19 +165,24 @@ const toSave = async () => {
 <template>
   <template v-if="selected">
     <div class="w-full flex gap-2 p-2 justify-between border-b">
-      <button class="icon-button" :disabled="!canSearchOnline" @click="toSearchOnline" title="search online">
+      <button
+        class="icon-button"
+        data-size="large"
+        :disabled="!canSearchOnline"
+        @click="toSearchOnline"
+        title="search online">
         <div class="i-md:screen-search-desktop-outline-rounded"></div>
       </button>
       <div class="flex gap-2">
-        <button class="icon-button" :disabled="!isInnerDirty" @click="toReset" title="reset">
+        <button class="icon-button" data-size="large" :disabled="!isInnerDirty" @click="toReset" title="reset">
           <div class="i-md:refresh"></div>
         </button>
-        <button class="icon-button" :disabled="!isInnerDirty" @click="toSave" title="save">
+        <button class="icon-button" data-size="large" :disabled="!isInnerDirty" @click="toSave" title="save">
           <div class="i-md:save-outline-rounded"></div>
         </button>
       </div>
     </div>
-    <div class="w-full flex-1 overflow-y-auto flex p-2">
+    <div class="w-full flex-1 overflow-y-auto p-2">
       <div v-if="!isLoadFailed" class="w-full flex flex-col items-center gap-2 text-sm">
         <div class="song-form-item">
           <div>Cover:</div>
@@ -170,7 +192,7 @@ const toSave = async () => {
           <div>Title:</div>
           <Tooltip direction="top">
             <input v-model="inner.title" @change="notifyChange" class="w-full rounded" />
-            <template #tooltip>
+            <template #tooltip v-if="showHint(inner.title)">
               <WordSplitter
                 :text="selected.name"
                 @select="
@@ -186,7 +208,7 @@ const toSave = async () => {
           <div>Artist:</div>
           <Tooltip direction="top">
             <input v-model="inner.artist" @change="notifyChange" class="w-full rounded" />
-            <template #tooltip>
+            <template #tooltip v-if="showHint(inner.artist)">
               <WordSplitter
                 :text="selected.name"
                 @select="
@@ -202,7 +224,7 @@ const toSave = async () => {
           <div>Album:</div>
           <Tooltip direction="top">
             <input v-model="inner.album" @change="notifyChange" class="w-full rounded" />
-            <template #tooltip>
+            <template #tooltip v-if="showHint(inner.album)">
               <WordSplitter
                 :text="selected.name"
                 @select="
@@ -217,12 +239,12 @@ const toSave = async () => {
         <div class="song-form-item">
           <div>Lyrics:</div>
           <textarea v-model="inner.lyric" @change="notifyChange" class="h-[150px] resize-none" />
+          <button class="button" @click="toSearchLyricOnline">search lyric</button>
         </div>
         <div class="song-form-item">
           <div>Comment:</div>
           <textarea v-model="inner.comment" @change="notifyChange" class="w-full rounded resize-none" />
           <div class="text-[10px] text-gray">some source may use comment to store id</div>
-          <button class="button" @click="toSearchLyricOnline">search lyric</button>
         </div>
       </div>
       <div v-else class="w-full flex-1 flex flex-col justify-center items-center">

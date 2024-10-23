@@ -22,7 +22,7 @@ const transformTags = (meta: IAudioMetadata) => {
 };
 
 export default class Song {
-  constructor(public path: string, public name: string, private file: () => Promise<Uint8Array>) {}
+  constructor(public path: string, public name: string, private readonly file: () => Promise<Uint8Array>) {}
 
   private innerFile: Uint8Array | undefined = undefined;
   private async getFile() {
@@ -52,6 +52,14 @@ export default class Song {
     const v = await transformTags(meta);
     this.innerTags = v;
     return v;
+  }
+
+  async loadTags() {
+    await this.getTags();
+  }
+
+  syncGetTags() {
+    return this.innerTags;
   }
 
   async update(v: Partial<CommonTag>) {
@@ -94,17 +102,22 @@ export default class Song {
       });
 
       const buffer = writer.addTag();
-      this.clearCache();
-      this.file = async () => new Uint8Array(buffer);
+      this.clearAllCache();
+      await this.loadTags();
       return buffer;
     };
     return [canSafeUpdate, next, diffs] as const;
   }
 
-  private clearCache() {
+  private clearAllCache() {
     this.innerFile = undefined;
     this.innerMeta = undefined;
     this.innerTags = undefined;
+  }
+
+  /** 释放内存同时保留音乐原数据信息 */
+  public releaseFile() {
+    this.innerFile = undefined;
   }
 }
 

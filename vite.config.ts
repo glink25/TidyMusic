@@ -9,14 +9,14 @@ const host = process.env.TAURI_DEV_HOST;
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  plugins: [
-    UnoCSS(),
-    vue(),
-  ],
+  plugins: [UnoCSS(), vue()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
+  },
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
   },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

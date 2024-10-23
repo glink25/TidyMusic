@@ -1,7 +1,13 @@
 <script lang="ts" setup>
 import { OverridesStrategy, ShowInputHint, useSettings } from "@/composables/useStorage";
 
-const { overridesStrategy, showInputHint } = useSettings();
+const { overridesStrategy, showInputHint, reset } = useSettings();
+
+const toResetSettings = () => {
+  reset();
+};
+
+const version = (window as any).__APP_VERSION__;
 </script>
 <template>
   <div class="p-2 min-w-[300px]">
@@ -25,7 +31,10 @@ const { overridesStrategy, showInputHint } = useSettings();
         </select>
       </div>
       <hr />
-      <div>About: version</div>
+      <div class="flex flex-col gap-2 justify-center items-center">
+        <button class="button" @click="toResetSettings">Reset to defaults</button>
+        <div>version: {{ version }}</div>
+      </div>
     </div>
   </div>
 </template>

@@ -29,6 +29,9 @@ dependencies:
   browser-id3-writer:
     specifier: ^6.1.0
     version: 6.1.0
+  lodash-es:
+    specifier: ^4.17.21
+    version: 4.17.21
   mime-types:
     specifier: ^2.1.35
     version: 2.1.35
@@ -43,9 +46,15 @@ devDependencies:
   '@iconify-json/material-symbols':
     specifier: ^1.2.5
     version: 1.2.5
+  '@iconify-json/tabler':
+    specifier: ^1.2.5
+    version: 1.2.5
   '@tauri-apps/cli':
     specifier: '>=2.0.0'
     version: 2.0.2
+  '@types/lodash-es':
+    specifier: ^4.17.12
+    version: 4.17.12
   '@types/mime-types':
     specifier: ^2.1.4
     version: 2.1.4
@@ -547,6 +556,12 @@ packages:
       '@iconify/types': 2.0.0
     dev: true
 
+  /@iconify-json/tabler@1.2.5:
+    resolution: {integrity: sha512-BDDLgDCbJ2btwi6cPmBL04QyPyNmWy6H13ynUAX48xxpxqUuG+hT+yrqL+RCugFimrvuhcecbSfEKnFc0BW1Ng==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: true
+
   /@iconify/types@2.0.0:
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
     dev: true
@@ -891,6 +906,16 @@ packages:
 
   /@types/estree@1.0.6:
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
+    dev: true
+
+  /@types/lodash-es@4.17.12:
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
+    dependencies:
+      '@types/lodash': 4.17.12
+    dev: true
+
+  /@types/lodash@4.17.12:
+    resolution: {integrity: sha512-sviUmCE8AYdaF/KIHLDJBQgeYzPBI0vf/17NaYehBJfYD1j6/L95Slh07NlyK2iNyBNaEkb3En2jRt+a8y3xZQ==}
     dev: true
 
   /@types/mime-types@2.1.4:
@@ -1567,6 +1592,10 @@ packages:
       mlly: 1.7.2
       pkg-types: 1.2.1
     dev: true
+
+  /lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+    dev: false
 
   /magic-string@0.30.12:
     resolution: {integrity: sha512-Ea8I3sQMVXr8JhN4z+H/d8zwo+tYDgHE9+5G4Wnrwhs0gaK9fXTKx0Tw5Xwsd/bCPTTZNRAdpyzvoeORe9LYpw==}
