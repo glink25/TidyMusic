@@ -72,6 +72,16 @@ const getLyric = async (songId: string) => {
 };
 
 export const createNeteaseSource = () => {
+  // const wd = new Window("unique");
+  // const fakeSongId = "123";
+  // const webview = new Webview(wd, "theUniqueLabel", {
+  //   url: `https://music.163.com/api/song/media?id=${fakeSongId}`,
+  //   x: 0,
+  //   y: 0,
+  //   width: 100,
+  //   height: 100,
+  // });
+
   const findList = async (params: Partial<CommonTag>) => {
     const { title, artist } = params;
     if (title === undefined && artist === undefined) {
@@ -109,6 +119,7 @@ export const createNeteaseSource = () => {
   return {
     findList,
     findLyrics,
+    title: "netease",
   };
 };
 

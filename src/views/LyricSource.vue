@@ -2,8 +2,8 @@
 import { ref } from "vue";
 import { CommonTag } from "@/utils/music";
 import useLoading from "@/ui/loading";
-import { createNeteaseSource } from "@/sources/netease";
 import { toasts } from "@/composables/useToast";
+import { useSources } from "@/composables/useSources";
 
 const props = defineProps<{
   input: Partial<CommonTag>;
@@ -11,12 +11,12 @@ const props = defineProps<{
 }>();
 
 const { domRef: loadingRef, controller: loading } = useLoading();
-
+const { selectedLyricSource } = useSources();
 const searchResults = ref<any[]>();
 const load = async () => {
   loading.show();
   try {
-    const source = createNeteaseSource();
+    const source = selectedLyricSource.value.source;
     const results = await source.findLyrics(props.input);
     searchResults.value = results;
   } catch (error) {

@@ -14,6 +14,7 @@ import Tooltip from "@/components/Tooltip.vue";
 import WordSplitter from "@/components/WordSplitter.vue";
 import LyricSource from "./LyricSource.vue";
 import { OverridesStrategy, ShowInputHint, useSettings } from "@/composables/useStorage";
+import { useSources } from "@/composables/useSources";
 
 const { overridesStrategy, showInputHint, showOverrideUnsupportedTagWarning } = useSettings();
 const showHint = (v: any) => (showInputHint.value === ShowInputHint.Always ? true : v === "" || v === undefined);
@@ -161,18 +162,34 @@ const toSave = async () => {
 };
 
 // useGlobalBackground(() => inner.cover)
+const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricSource, setSelectedLyricSource } =
+  useSources();
 </script>
 <template>
   <template v-if="selected">
     <div class="w-full flex gap-2 p-2 justify-between border-b">
-      <button
-        class="icon-button"
-        data-size="large"
-        :disabled="!canSearchOnline"
-        @click="toSearchOnline"
-        title="search online">
-        <div class="i-md:screen-search-desktop-outline-rounded"></div>
-      </button>
+      <div class="flex items-center">
+        <button
+          class="icon-button"
+          data-size="large"
+          :disabled="!canSearchOnline"
+          @click="toSearchOnline"
+          title="search online">
+          <div class="i-md:screen-search-desktop-outline-rounded"></div>
+        </button>
+        <select
+          class="text-xs outline-none text-text"
+          :value="selectedSource.id"
+          @change="
+            (v) => {
+              console.log(v);
+              setSelectedSource((v.target as any)?.value);
+            }
+          ">
+          <option value="" disabled>select default source</option>
+          <option v-for="source in sources" :key="source.id" :value="source.id">{{ source.title }}</option>
+        </select>
+      </div>
       <div class="flex gap-2">
         <button class="icon-button" data-size="large" :disabled="!isInnerDirty" @click="toReset" title="reset">
           <div class="i-md:refresh"></div>
@@ -239,7 +256,20 @@ const toSave = async () => {
         <div class="song-form-item">
           <div>Lyrics:</div>
           <textarea v-model="inner.lyric" @change="notifyChange" class="h-[150px] resize-none" />
-          <button class="button" @click="toSearchLyricOnline">search lyric</button>
+          <div class="flex items-center gap-2">
+            <button class="button" @click="toSearchLyricOnline">search lyric</button>
+            <select
+              class="text-xs outline-none text-text underline"
+              :value="selectedLyricSource.id"
+              @change="
+            (v) => {
+              setSelectedLyricSource((v as any).value);
+            }
+          ">
+              <option value="" disabled>select default source</option>
+              <option v-for="source in lyricSources" :key="source.id" :value="source.id">{{ source.title }}</option>
+            </select>
+          </div>
         </div>
         <div class="song-form-item">
           <div>Comment:</div>
