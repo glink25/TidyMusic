@@ -60,7 +60,7 @@ const toSeeMore = async (result: FindSongReturned) => {
               </div>
             </div>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 text-sm">
             <button v-if="selectedSource.source.getMoreDetail" class="button" @click="toSeeMore(result)">
               See more
             </button>

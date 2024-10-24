@@ -57,7 +57,7 @@ const toApply = () => {
         <div>lyric:</div>
         <div class="flex-1 overflow-y-auto border rounded p-2">{{ detail.lyric }}</div>
       </div>
-      <div class="flex gap-2">
+      <div class="flex gap-2 text-sm">
         <button class="button" @click="toCancel">Cancel</button>
         <button class="button" data-type="primary" @click="toApply">Use this</button>
       </div>

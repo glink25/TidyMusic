@@ -40,7 +40,7 @@ const toApply = (result: any) => {
           <div class="flex-1 h-20 rounded border p-1 overflow-y-auto whitespace-pre">
             {{ result.lyric }}
           </div>
-          <div class="flex-shrink-0">
+          <div class="flex-shrink-0 text-sm">
             <button class="button" @click="toApply(result)">Use this</button>
           </div>
         </div>

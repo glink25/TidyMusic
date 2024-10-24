@@ -1,3 +1,4 @@
+/* 原生css适配 */
 body {
   width: 100vw;
   height: 100vh;
@@ -6,12 +7,6 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  /* body{
-    --color-text: white;
-    --color-icon: white;
-    --color-bg: #333333;
-  } */
-
   hr{
     border-color: #7d7d7d;
   }
@@ -30,7 +25,21 @@ body {
   background-color: rgba(0, 0, 0,0.28);
   border-radius: 5px;
 }
+input:focus, optgroup:focus, select:focus, textarea:focus{
+  @apply outline outline-[2px] outline-primary
+}
 
+select {
+  appearance: none;
+  background: transparent;
+}
+
+* {
+  user-select: none;
+  -webkit-user-select: none
+}
+
+/* 自定义全局style */
 #title-bar{
   position: fixed;
   top: 0;
@@ -64,14 +73,6 @@ body {
 
 .icon-button[data-size="large"]{
   @apply [&>div]:(w-[20px] h-[20px])
-}
-
-input:focus, optgroup:focus, select:focus, textarea:focus{
-  @apply outline outline-[2px] outline-primary
-}
-select {
-  appearance: none;
-  background: transparent;
 }
 
 .select-wrapper{
