@@ -1,10 +1,10 @@
 import { CommonTag } from "@/utils/music";
-import { fetch } from "@tauri-apps/plugin-http";
+import { SourceBuilder } from "./helper";
 
-const search = async (s: string): Promise<CommonTag[]> => {
+const search = async (fetcher: typeof fetch, s: string) => {
   const amu = `https://music.apple.com/cn/search?term=${encodeURIComponent(s)}`;
   const itu = `https://itunes.apple.com/search?country=cn&term=${encodeURIComponent(s)}`;
-  const resp = await fetch(itu, {
+  const resp = await fetcher(itu, {
     headers: {
       accept:
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -31,29 +31,31 @@ const search = async (s: string): Promise<CommonTag[]> => {
   const json: any = await resp.json();
   console.log("search json:", json);
   return json.results?.map((song: any) => ({
-    title: song.trackName,
-    artist: song.artistName,
-    album: song.collectionName,
-    cover: song.artworkUrl100,
-    lyric: "",
-    genre: song.primaryGenreName,
-    comment: `itunesId:${song.trackId}`,
+    song: {
+      title: song.trackName,
+      artist: song.artistName,
+      album: song.collectionName,
+      cover: song.artworkUrl100,
+      lyric: "",
+      genre: song.primaryGenreName,
+      comment: `itunesId:${song.trackId}`,
+    },
   }));
 };
 
-export const createAppleMusicSource = () => {
-  const findList = async (params: Partial<CommonTag>) => {
+export const createAppleMusicSource: SourceBuilder = (fetcher) => {
+  const findSongs = async (params: Partial<CommonTag>) => {
     const { title, artist } = params;
     if (title === undefined && artist === undefined) {
       return [];
     }
-    const results = await search([title, artist].join("+"));
+    const results = await search(fetcher, [title, artist].join("+"));
     console.log(results, "results");
     return results;
   };
 
   return {
-    findList,
+    findSongs,
     title: "apple music cn",
   };
 };

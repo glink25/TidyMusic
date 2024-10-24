@@ -90,6 +90,8 @@ export type Settings = {
     overridesStrategy: OverridesStrategy;
     showInputHint: ShowInputHint;
     showOverrideUnsupportedTagWarning: boolean;
+    defaultSourceId: string;
+    defaultLyricSourceId: string;
   };
   autoFixerSettings: {};
 };
@@ -106,5 +108,14 @@ export const useSettings = (() => {
     ["appSettings", "showOverrideUnsupportedTagWarning"],
     true as boolean
   );
-  return () => ({ overridesStrategy, showInputHint, showOverrideUnsupportedTagWarning, reset });
+  const defaultSourceId = createRef(["appSettings", "defaultSourceId"], "0" as string);
+  const defaultLyricSourceId = createRef(["appSettings", "defaultLyricSourceId"], "0" as string);
+  return () => ({
+    overridesStrategy,
+    showInputHint,
+    showOverrideUnsupportedTagWarning,
+    defaultSourceId,
+    defaultLyricSourceId,
+    reset,
+  });
 })();

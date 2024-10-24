@@ -255,19 +255,22 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
         <div class="song-form-item">
           <div>Lyrics:</div>
           <textarea v-model="inner.lyric" @change="notifyChange" class="h-[150px] resize-none" />
-          <div class="flex items-center gap-2">
+          <div class="flex flex-col items-center gap-2">
             <button class="button" @click="toSearchLyricOnline">search lyric</button>
-            <select
-              class="text-xs outline-none text-text underline"
-              :value="selectedLyricSource.id"
-              @change="
+            <div class="flex items-center gap-2 text-xs text-text">
+              <div>lyric source:</div>
+              <select
+                class="outline-none underline"
+                :value="selectedLyricSource.id"
+                @change="
             (v) => {
               setSelectedLyricSource((v as any).value);
             }
           ">
-              <option value="" disabled>select default source</option>
-              <option v-for="source in lyricSources" :key="source.id" :value="source.id">{{ source.title }}</option>
-            </select>
+                <option value="" disabled>select default source</option>
+                <option v-for="source in lyricSources" :key="source.id" :value="source.id">{{ source.title }}</option>
+              </select>
+            </div>
           </div>
         </div>
         <div class="song-form-item">

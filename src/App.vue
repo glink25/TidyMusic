@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MusicList from "@/views/MusicList.vue";
-import Details from "@/views/Details.vue";
+import Editor from "@/views/Editor.vue";
 import { LoadingWrapper } from "@/composables/useGlobalLoading";
 import { ToastWrapper } from "@/composables/useToast";
 </script>
@@ -12,7 +12,7 @@ import { ToastWrapper } from "@/composables/useToast";
       <MusicList />
     </div>
     <div class="flex-[70%] h-full flex flex-col">
-      <Details />
+      <Editor />
     </div>
   </div>
   <ToastWrapper />

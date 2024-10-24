@@ -1,48 +1,55 @@
 import { CommonTag } from "@/utils/music";
-import { fetch } from "@tauri-apps/plugin-http";
+import { SourceBuilder } from "./helper";
 
-const search = async (s: string): Promise<CommonTag[]> => {
-  const resp = await fetch(`https://music.163.com/api/search/pc?offset=0&limit=10&type=1&s=${encodeURIComponent(s)}`, {
-    headers: {
-      accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-      "accept-language": "zh-CN,zh;q=0.9",
-      "cache-control": "no-cache",
-      pragma: "no-cache",
-      priority: "u=0, i",
-      "sec-ch-ua": '"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"',
-      "sec-ch-ua-mobile": "?0",
-      "sec-ch-ua-platform": '"macOS"',
-      "sec-fetch-dest": "document",
-      "sec-fetch-mode": "navigate",
-      "sec-fetch-site": "none",
-      "sec-fetch-user": "?1",
-      "upgrade-insecure-requests": "1",
-    },
-    referrerPolicy: "strict-origin-when-cross-origin",
-    body: null,
-    method: "GET",
-    mode: "cors",
-    credentials: "include",
-  });
+const search = async (fetcher: typeof fetch, s: string) => {
+  const resp = await fetcher(
+    `https://music.163.com/api/search/pc?offset=0&limit=10&type=1&s=${encodeURIComponent(s)}`,
+    {
+      headers: {
+        accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "accept-language": "zh-CN,zh;q=0.9",
+        "cache-control": "no-cache",
+        pragma: "no-cache",
+        priority: "u=0, i",
+        "sec-ch-ua": '"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "none",
+        "sec-fetch-user": "?1",
+        "upgrade-insecure-requests": "1",
+      },
+      referrerPolicy: "strict-origin-when-cross-origin",
+      body: null,
+      method: "GET",
+      mode: "cors",
+      credentials: "include",
+    }
+  );
   // const resp = await fetch(`https://music.163.com/api/search/pc?offset=0&limit=10&type=1&s=${encodeURIComponent(s)}`)
   const json: Resp = await resp.json();
   console.log("search json:", json);
   return json.result.songs.map((song) => {
     return {
-      title: song.name,
-      artist: song.artists[0].name,
-      album: song.album.name,
-      cover: song.album.picUrl,
-      lyric: "",
-      genre: "",
-      comment: `neteaseId:${song.id}`,
+      song: {
+        title: song.name,
+        artist: song.artists[0].name,
+        album: song.album.name,
+        cover: song.album.picUrl,
+        lyric: "",
+        genre: "",
+        comment: `neteaseId:${song.id}`,
+      },
+      more: true,
+      id: song.id,
     };
   });
 };
 
-const getLyric = async (songId: string) => {
-  const data = await fetch(`https://music.163.com/api/song/media?id=${songId}`, {
+const getMediaInfo = async (fetcher: typeof fetch, songId: string) => {
+  const data = await fetcher(`https://music.163.com/api/song/media?id=${songId}`, {
     headers: {
       accept:
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -68,27 +75,26 @@ const getLyric = async (songId: string) => {
 
   const jsonp: { code: number; lyric: string } = await data.json();
 
-  return jsonp.lyric;
+  return jsonp;
 };
 
-export const createNeteaseSource = () => {
-  // const wd = new Window("unique");
-  // const fakeSongId = "123";
-  // const webview = new Webview(wd, "theUniqueLabel", {
-  //   url: `https://music.163.com/api/song/media?id=${fakeSongId}`,
-  //   x: 0,
-  //   y: 0,
-  //   width: 100,
-  //   height: 100,
-  // });
-
-  const findList = async (params: Partial<CommonTag>) => {
+export const createNeteaseSource: SourceBuilder = (fetcher) => {
+  const findSongs = async (params: Partial<CommonTag>) => {
     const { title, artist } = params;
     if (title === undefined && artist === undefined) {
       return [];
     }
-    const results = await search([title, artist].join(" "));
+    const results = await search(fetcher, [title, artist].join(" "));
     return results;
+  };
+
+  const getMoreDetail = async (params: any) => {
+    const { id, song } = params;
+    const info = await getMediaInfo(fetcher, id);
+    return {
+      ...song,
+      lyric: info.lyric,
+    };
   };
 
   const findLyrics = async (params: Partial<CommonTag>) => {
@@ -107,18 +113,19 @@ export const createNeteaseSource = () => {
         throw new Error("no song id found in comment filed");
       }
     })();
-    const lyric = await getLyric(songId);
+    const info = await getMediaInfo(fetcher, songId);
 
     return [
       {
-        lyric,
+        lyric: info.lyric,
       },
     ];
   };
 
   return {
-    findList,
+    findSongs,
     findLyrics,
+    getMoreDetail,
     title: "netease",
   };
 };
