@@ -1,29 +1,38 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
-
+import { computed } from "vue";
 
 const props = defineProps<{
-    text: string
-}>()
+  text: string;
+}>();
 const emits = defineEmits<{
-    (name: "select", value: string): void
-}>()
+  (name: "select", value: string): void;
+}>();
 const words = computed(() => {
-    const text = props.text.split(".")?.[0]
-    const splitters = ["-", ".", ",", "/", "·"]
-    return splitters.reduce((p, c) => {
-        return p.map(text => text.split(c)).flat()
-    }, [text]).filter(w => w !== '').map(v => v.trim())
-})
+  const text = props.text.split(".")?.[0];
+  const splitters = ["-", ".", ",", "/", "·"];
+  return splitters
+    .reduce(
+      (p, c) => {
+        return p.map((text) => text.split(c)).flat();
+      },
+      [text]
+    )
+    .filter((w) => w !== "")
+    .map((v) => v.trim());
+});
 </script>
 <template>
-    <div class="flex flex-col text-xs bg-white p-2 gap-1 rounded min-w-[120px] max-w-[200px]">
-        <div class="w-full text-center text-gray">select words:</div>
-        <div class="flex gap-1 justify-center flex-wrap">
-            <div v-for="(word, index) in words" :key="index" class="border rounded px-1 cursor-pointer active:bg-gray"
-                :tabindex="index" @click="emits('select', word)">
-                {{ word }}
-            </div>
-        </div>
+  <div class="flex flex-col text-xs bg-bg @dark:border p-2 gap-1 rounded min-w-[120px] max-w-[200px]">
+    <div class="w-full text-center">select words:</div>
+    <div class="flex gap-1 justify-center flex-wrap">
+      <div
+        v-for="(word, index) in words"
+        :key="index"
+        class="border rounded px-1 cursor-pointer active:brightness-80"
+        :tabindex="index"
+        @click="emits('select', word)">
+        {{ word }}
+      </div>
     </div>
+  </div>
 </template>

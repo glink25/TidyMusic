@@ -11,7 +11,7 @@ const props = defineProps<{
   exit: (v: Partial<CommonTag> | undefined) => void;
 }>();
 
-const { controller: loading, domRef } = useLoading();
+const { controller: loading, domRef, visible: isLoading } = useLoading();
 const { selectedSource } = useSources();
 
 const detail = ref<Partial<CommonTag>>();
@@ -62,5 +62,6 @@ const toApply = () => {
         <button class="button" data-type="primary" @click="toApply">Use this</button>
       </div>
     </div>
+    <div v-else-if="!isLoading" class="w-full h-full flex justify-center items-center">No results</div>
   </div>
 </template>

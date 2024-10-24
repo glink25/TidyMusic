@@ -76,6 +76,9 @@ devDependencies:
   unocss:
     specifier: ^0.63.4
     version: 0.63.4(postcss@8.4.47)(vite@5.4.8)
+  unocss-preset-theme:
+    specifier: ^0.14.1
+    version: 0.14.1(@unocss/core@0.63.4)
   vite:
     specifier: ^5.3.1
     version: 5.4.8(@types/node@22.7.7)
@@ -1884,6 +1887,15 @@ packages:
 
   /undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
+    dev: true
+
+  /unocss-preset-theme@0.14.1(@unocss/core@0.63.4):
+    resolution: {integrity: sha512-j2sFIUeKy0FC3DejIZ/+tyiKEszoMiAAsuOyZBubw7XErHL5ZvpwBmLM5Qj/czbfKbv1TdeJW5RO4PRKACiRGw==}
+    peerDependencies:
+      '@unocss/core': '>= 0.52.0'
+    dependencies:
+      '@unocss/core': 0.63.4
+      '@unocss/rule-utils': 0.63.4
     dev: true
 
   /unocss@0.63.4(postcss@8.4.47)(vite@5.4.8):

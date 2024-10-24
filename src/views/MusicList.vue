@@ -7,6 +7,7 @@ import Settings from "./Settings.vue";
 import AutoFixer from "./AutoFixer.vue";
 import { computed, ref } from "vue";
 import { chain } from "lodash-es";
+import { toasts } from "@/composables/useToast";
 
 const { list, addMusic, selected, toSelect } = useMusicList();
 const chooseFolder = async () => {
@@ -18,6 +19,7 @@ const chooseFolder = async () => {
       await addMusic(file.fullpath, file.name, file.data);
     } catch (error) {
       console.error(error);
+      toasts.error(`${error}`);
     }
   });
 };
@@ -70,7 +72,7 @@ const [showSettings, SettingsPop] = usePopcon();
 const [showAutoFixer, AutoFixerPop] = usePopcon();
 </script>
 <template>
-  <div class="p-2 flex justify-between border-b">
+  <div class="p-2 flex justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]">
     <div class="flex">
       <button @click="chooseFolder" class="icon-button" data-size="large" title="import songs from folder">
         <div class="i-md:drive-file-move-outline-rounded"></div>
@@ -90,9 +92,13 @@ const [showAutoFixer, AutoFixerPop] = usePopcon();
     </div>
   </div>
   <div class="p-2 flex-1 overflow-hidden w-full">
-    <div class="pt-1 pb-2 px-1 flex gap-2 w-full overflow-hidden">
+    <div class="pt-1 pb-2 px-1 flex gap-2 items-center w-full overflow-hidden">
       <div class="flex-1">
-        <input type="text" v-model="filterText" class="text-sm border rounded px-2 w-full" placeholder="filter" />
+        <input
+          type="text"
+          v-model="filterText"
+          class="text-sm border rounded px-2 py-1 w-full bg-transparent"
+          placeholder="filter" />
       </div>
       <button
         class="icon-button"
@@ -122,19 +128,27 @@ const [showAutoFixer, AutoFixerPop] = usePopcon();
       </button>
     </div>
     <div class="h-full overflow-y-auto">
-      <template v-for="item in computedList" :key="item.path">
-        <div
-          class="px-2 cursor-pointer text-sm rounded"
-          :class="[selected?.path === item.path && 'bg-yellow']"
-          :title="item.path">
-          <div class="whitespace-nowrap">
-            <div class="py-2 overflow-hidden text-ellipsis" @click="() => toSelect(item.path)">
-              {{ item.name }}
+      <template v-if="computedList.length">
+        <template v-for="item in computedList" :key="item.path">
+          <div
+            class="px-2 cursor-pointer text-sm rounded"
+            :class="[selected?.path === item.path && 'bg-primary']"
+            :title="item.path">
+            <div class="whitespace-nowrap">
+              <div class="py-2 overflow-hidden text-ellipsis" @click="() => toSelect(item.path)">
+                {{ item.name }}
+              </div>
+              <hr :class="[selected?.path === item.path && 'opacity-0']" />
             </div>
-            <hr :class="[selected?.path === item.path && 'opacity-0']" />
           </div>
-        </div>
+        </template>
       </template>
+      <div v-else-if="list.length" class="w-full h-full text-text text-sm flex justify-center items-center pb-[50%]">
+        No result
+      </div>
+      <div v-else class="w-full h-full text-text text-sm flex justify-center items-center pb-[50%]">
+        Start to import music
+      </div>
     </div>
   </div>
   <AutoFixerPop>

@@ -167,7 +167,7 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
 </script>
 <template>
   <template v-if="selected">
-    <div class="w-full flex gap-2 p-2 justify-between border-b">
+    <div class="w-full flex gap-2 p-2 justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]">
       <div class="flex items-center">
         <button
           class="icon-button"
@@ -178,7 +178,7 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
           <div class="i-md:screen-search-desktop-outline-rounded"></div>
         </button>
         <select
-          class="text-xs outline-none text-text"
+          class="text-xs outline-none text-text underline"
           :value="selectedSource.id"
           @change="
             (v) => {
@@ -193,7 +193,12 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
         <button class="icon-button" data-size="large" :disabled="!isInnerDirty" @click="toReset" title="reset">
           <div class="i-md:refresh"></div>
         </button>
-        <button class="icon-button" data-size="large" :disabled="!isInnerDirty" @click="toSave" title="save">
+        <button
+          class="icon-button save-button"
+          data-size="large"
+          :disabled="!isInnerDirty"
+          @click="toSave"
+          title="save">
           <div class="i-md:save-outline-rounded"></div>
         </button>
       </div>
@@ -267,7 +272,7 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
               setSelectedLyricSource((v as any).value);
             }
           ">
-                <option value="" disabled>select default source</option>
+                <option value="" disabled>select</option>
                 <option v-for="source in lyricSources" :key="source.id" :value="source.id">{{ source.title }}</option>
               </select>
             </div>
@@ -306,5 +311,13 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
 input,
 textarea {
   @apply text-center p-1 bg-[rgba(0,0,0,0.1)];
+}
+
+.save-button:not(:disabled) {
+  position: relative;
+}
+.save-button:not(:disabled)::after {
+  content: "";
+  @apply absolute top-[4px] right-[4px] w-[6px] h-[6px] bg-primary rounded-full;
 }
 </style>

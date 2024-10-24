@@ -8,10 +8,10 @@ import { ToastWrapper } from "@/composables/useToast";
 <template>
   <div class="flex w-full h-full">
     <div
-      class="flex-1 min-w-[240px] h-full flex flex-col overflow-hidden backdrop-blur-lg bg-white bg-opacity-10 shadow-[1px_0px_1px_rgba(0,0,0,0.1)]">
+      class="flex-1 pt-[16px] min-w-[260px] h-full flex flex-col overflow-hidden shadow-[1px_0px_1px_rgba(0,0,0,0.1)]">
       <MusicList />
     </div>
-    <div class="flex-[70%] h-full flex flex-col">
+    <div class="flex-[70%] pt-[16px] h-full flex flex-col">
       <Editor />
     </div>
   </div>

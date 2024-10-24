@@ -12,9 +12,13 @@
   "app": {
     "windows": [
       {
-        "title": "tidy-music",
+        "title": "",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "minWidth": 480,
+        "minHeight": 240,
+        "titleBarStyle": "Overlay",
+        "dragDropEnabled": true
       }
     ],
     "security": {

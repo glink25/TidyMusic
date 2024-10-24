@@ -1,24 +1,60 @@
 body {
   width: 100vw;
   height: 100vh;
+  min-width: 480px;
+  @apply bg-bg text-text
 }
-select {
-  appearance: none;
+
+@media (prefers-color-scheme: dark) {
+  /* body{
+    --color-text: white;
+    --color-icon: white;
+    --color-bg: #333333;
+  } */
+
+  hr{
+    border-color: #7d7d7d;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  background-color: rgba(0, 0, 0, 0.1);
+  opacity: 0;
+}
+::-webkit-scrollbar:hover {
+  width: 4px;
+  opacity: 1;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0,0.28);
+  border-radius: 5px;
+}
+
+#title-bar{
+  position: fixed;
+  top: 0;
+  z-index: 4000;
+  width: 100%;
+  height: 12px;
+  background-color: transparent;
+  cursor: move
 }
 
 #app {
-  @apply w-full h-full bg-white bg-opacity-20 backdrop-blur-2xl;
+  @apply w-full h-full
 }
 
 .button {
-  @apply shadow-sm rounded-md px-1 border text-sm bg-white 
+  @apply shadow-sm rounded-md px-1 border text-sm bg-bg 
     disabled:(opacity-60 cursor-not-allowed) 
     not-disabled:active:(brightness-90)
-    data-[type=primary]:not-disabled:(bg-primary text-white);
+    data-[type=primary]:not-disabled:(bg-primary text-white)
+    data-[type=primary]:(border-[rgba(0,0,0,0.1)])
 }
 
 .icon-button {
-  @apply text-text rounded p-1 bg-transparent transition-all 
+  @apply text-icon rounded p-1 bg-transparent transition-all 
     not-disabled:hover:(bg-[rgba(0,0,0,0.1)]) not-disabled:active:(bg-[rgba(0,0,0,0.2)])
     disabled:(opacity-20 cursor-not-allowed)
 }
@@ -28,4 +64,30 @@ select {
 
 .icon-button[data-size="large"]{
   @apply [&>div]:(w-[20px] h-[20px])
+}
+
+input:focus, optgroup:focus, select:focus, textarea:focus{
+  @apply outline outline-[2px] outline-primary
+}
+select {
+  appearance: none;
+  background: transparent;
+}
+
+.select-wrapper{
+  @apply relative flex items-center
+  
+}
+.select-wrapper::after{
+  position: absolute;
+  right: 8px;
+  content: '';
+  width: 12px;
+  height: 12px;
+  background-image: icon('i-md:arrow-drop-down-rounded');
+  background-size: 150%;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  fill: red;
 }
