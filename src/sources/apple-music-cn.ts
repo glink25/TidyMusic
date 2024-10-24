@@ -2,7 +2,7 @@ import { CommonTag } from "@/utils/music";
 import { SourceBuilder } from "./helper";
 
 const search = async (fetcher: typeof fetch, s: string) => {
-  const amu = `https://music.apple.com/cn/search?term=${encodeURIComponent(s)}`;
+  // const amu = `https://music.apple.com/cn/search?term=${encodeURIComponent(s)}`;
   const itu = `https://itunes.apple.com/search?country=cn&term=${encodeURIComponent(s)}`;
   const resp = await fetcher(itu, {
     headers: {

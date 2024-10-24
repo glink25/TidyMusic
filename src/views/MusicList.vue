@@ -6,7 +6,7 @@ import { usePopcon } from "@/ui/popcon";
 import Settings from "./Settings.vue";
 import AutoFixer from "./AutoFixer.vue";
 import { computed, ref } from "vue";
-import { chain } from "lodash-es";
+import { orderBy } from "lodash-es";
 import { toasts } from "@/composables/useToast";
 
 const { list, addMusic, selected, toSelect } = useMusicList();
@@ -34,8 +34,8 @@ const textSortAscent = ref(true);
 const metaFullAscent = ref(false);
 
 const computedList = computed(() => {
-  return chain(list.value)
-    .filter((song) => {
+  return orderBy(
+    list.value.filter((song) => {
       if (filterText.value === "") return true;
       const keyword = filterText.value.toLowerCase();
       return (
@@ -46,25 +46,23 @@ const computedList = computed(() => {
         }) ??
           false)
       );
-    })
-    .orderBy(
-      [
-        "name",
-        (o) => {
-          return o.syncGetTags()?.find((v) => v.label === "title")?.value;
-        },
-      ],
-      textSortAscent.value ? "asc" : "desc"
-    )
-    .orderBy(
-      [
-        (o) => {
-          return o.syncGetTags()?.filter((t) => t.value !== undefined && t.value !== "").length ?? 0;
-        },
-      ],
-      metaFullAscent.value ? "asc" : "desc"
-    )
-    .value();
+    }),
+    [
+      (o) => {
+        return o.syncGetTags()?.filter((t) => t.value !== undefined && t.value !== "").length ?? 0;
+      },
+
+      "name",
+      (o) => {
+        return o.syncGetTags()?.find((v) => v.label === "title")?.value;
+      },
+    ],
+    [
+      metaFullAscent.value ? "asc" : "desc",
+      textSortAscent.value ? "asc" : "desc",
+      textSortAscent.value ? "asc" : "desc",
+    ]
+  );
 });
 
 const [showSettings, SettingsPop] = usePopcon();

@@ -14,7 +14,7 @@ export const CommonTags = [
     label: "title",
     format: MusicTagFormat.text,
     getValue: async (tag: IAudioMetadata) => tag.common.title,
-    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
+    setValue: async (value: string | undefined, _writer: ID3Writer, _curValue: any): Promise<ITag | undefined> => {
       return {
         id: "TIT2",
         value,
@@ -25,7 +25,7 @@ export const CommonTags = [
     label: "artist",
     format: MusicTagFormat.text,
     getValue: async (tag: IAudioMetadata) => tag.common.artist,
-    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
+    setValue: async (value: string | undefined, _writer: ID3Writer, _curValue: any): Promise<ITag | undefined> => {
       return {
         id: "TPE1",
         value: [value],
@@ -36,7 +36,7 @@ export const CommonTags = [
     label: "album",
     format: MusicTagFormat.text,
     getValue: async (tag: IAudioMetadata) => tag.common.album,
-    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
+    setValue: async (value: string | undefined, _writer: ID3Writer, _curValue: any): Promise<ITag | undefined> => {
       return {
         id: "TALB",
         value,
@@ -47,7 +47,7 @@ export const CommonTags = [
     label: "comment",
     format: MusicTagFormat.text,
     getValue: async (tag: IAudioMetadata) => tag.common.comment?.find((v) => v.text?.length)?.text,
-    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
+    setValue: async (value: string | undefined, _writer: ID3Writer, _curValue: any): Promise<ITag | undefined> => {
       if (value === undefined) {
         return {
           id: "COMM",
@@ -77,7 +77,7 @@ export const CommonTags = [
       const url = URL.createObjectURL(blob);
       return url;
     },
-    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
+    setValue: async (value: string | undefined, _writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
       if (value === undefined) {
         return {
           id: "APIC",
@@ -108,7 +108,7 @@ export const CommonTags = [
         (tag.native?.["ID3v2.2"]?.find((v) => v.id === "ULT")?.value as any)?.text
       );
     },
-    setValue: async (value: string | undefined, writer: ID3Writer, curValue: any): Promise<ITag | undefined> => {
+    setValue: async (value: string | undefined, _writer: ID3Writer, _curValue: any): Promise<ITag | undefined> => {
       if (value === undefined) {
         return {
           id: "USLT",

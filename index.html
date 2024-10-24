@@ -1,15 +1,22 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri + Vue + Typescript App</title>
-  </head>
+<head>
+  <meta http-equiv="Content-Security-Policy" content="
+  default-src 'self' customprotocol: asset:; 
+  connect-src ipc: http://ipc.localhost ws:; 
+  img-src * 'self' asset: http://asset.localhost blob: data:; 
+  style-src 'unsafe-inline' 'self';
+" />
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tauri + Vue + Typescript App</title>
+</head>
 
-  <body>
-    <div data-tauri-drag-region id="title-bar"></div>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<body>
+  <div data-tauri-drag-region id="title-bar"></div>
+  <div id="app"></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

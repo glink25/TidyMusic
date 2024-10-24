@@ -1,4 +1,4 @@
-import { Ref, watch } from "vue";
+import { watch } from "vue";
 
 export default function useGlobalBackground(watcher: () => string | undefined) {
   const clean = () => {
