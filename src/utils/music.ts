@@ -93,7 +93,7 @@ export const CommonTags = [
         id: "APIC",
         value: {
           description: "",
-          type: 3,
+          type: 0,
           data: content,
         },
       };

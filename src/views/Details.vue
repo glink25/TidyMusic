@@ -39,7 +39,7 @@ const notifyChange = () => {
 watch(selected, (_o, _n, onCleanUp) => {
   const [promise, cancel] = abortable(getTag(selected.value));
   promise
-    .then((v) => {
+    .then(async (v) => {
       Object.assign(inner, v);
       isLoadFailed.value = false;
     })
@@ -182,7 +182,6 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
           :value="selectedSource.id"
           @change="
             (v) => {
-              console.log(v);
               setSelectedSource((v.target as any)?.value);
             }
           ">
