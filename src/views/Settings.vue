@@ -1,5 +1,9 @@
 <script lang="ts" setup>
-import { OverridesStrategy, ShowInputHint, useSettings } from "@/composables/useStorage";
+import {
+  OverridesStrategy,
+  ShowInputHint,
+  useSettings,
+} from "@/composables/useStorage";
 
 const { overridesStrategy, showInputHint, reset } = useSettings();
 
@@ -23,7 +27,6 @@ const version = (window as any).__APP_VERSION__;
           </select>
         </div>
       </div>
-      <hr />
       <div class="w-full flex justify-between items-center p-2">
         <div>Show input hint:</div>
         <div class="select-wrapper">
@@ -34,10 +37,17 @@ const version = (window as any).__APP_VERSION__;
           </select>
         </div>
       </div>
-      <hr />
-      <div class="flex flex-col gap-2 justify-center items-center p-2">
-        <button class="button" @click="toResetSettings">Reset to defaults</button>
-        <div>version: {{ version }}</div>
+      <div class="flex flex-col gap-2 justify-center items-center p-2 text-xs">
+        <button class="button" @click="toResetSettings">
+          Reset to defaults
+        </button>
+        <div class="text-xs">version: {{ version }}</div>
+        <a
+          class="text-xs underline"
+          href="https://github.com/glink25/TidyMusic"
+          target="_blank"
+          >Github</a
+        >
       </div>
     </div>
   </div>

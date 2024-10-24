@@ -3,8 +3,8 @@ body {
   width: 100vw;
   height: 100vh;
   min-width: 480px;
-  transition: background ease 0.2s;
-  @apply bg-bg text-text
+  transition: background ease 0.5s;
+  @apply bg-white @dark:bg-black text-white
 }
 
 @media (prefers-color-scheme: dark) {
@@ -32,7 +32,7 @@ input:focus, optgroup:focus, select:focus, textarea:focus{
 
 select {
   appearance: none;
-  background: transparent;
+  @apply rounded border-none bg-transparent text-white
 }
 
 * {
@@ -52,19 +52,20 @@ select {
 }
 
 #app {
-  @apply w-full h-full backdrop-blur-3xl backdrop-saturate-80 bg-black bg-opacity-20
+  @apply w-full h-full backdrop-blur-3xl backdrop-saturate-80 bg-black bg-opacity-40
 }
 
 .button {
-  @apply shadow-sm rounded-md px-1 border text-sm bg-bg 
+    @apply rounded px-2 py-1 bg-black bg-opacity-20 text-white
     disabled:(opacity-60 cursor-not-allowed) 
-    not-disabled:active:(brightness-90)
+    not-disabled:active:(bg-opacity-40)
+    not-disabled:not-active:hover:(bg-opacity-30)
     data-[type=primary]:not-disabled:(bg-primary text-white)
     data-[type=primary]:(border-[rgba(0,0,0,0.1)])
 }
 
 .icon-button {
-  @apply text-icon rounded p-1 bg-transparent transition-all 
+  @apply text-white text-opacity-60 rounded p-1 bg-transparent transition-all 
     not-disabled:hover:(bg-[rgba(0,0,0,0.1)]) not-disabled:active:(bg-[rgba(0,0,0,0.2)])
     disabled:(opacity-20 cursor-not-allowed)
 }
@@ -77,7 +78,7 @@ select {
 }
 
 .select-wrapper{
-  @apply relative flex items-center
+  @apply relative flex items-center bg-black bg-opacity-20 text-text
   
 }
 .select-wrapper::after{
@@ -92,4 +93,8 @@ select {
   background-position: center;
   pointer-events: none;
   fill: red;
+}
+
+.sinked{
+  @apply bg-black bg-opacity-10 @dark:bg-opacity-40
 }
