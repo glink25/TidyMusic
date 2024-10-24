@@ -13,11 +13,20 @@ import SingleImagePicker from "@/components/SingleImagePicker.vue";
 import Tooltip from "@/components/Tooltip.vue";
 import WordSplitter from "@/components/WordSplitter.vue";
 import LyricSource from "./LyricSource.vue";
-import { OverridesStrategy, ShowInputHint, useSettings } from "@/composables/useStorage";
+import {
+  OverridesStrategy,
+  ShowInputHint,
+  useSettings,
+} from "@/composables/useStorage";
 import { useSources } from "@/composables/useSources";
+import useGlobalBackground from "@/composables/useGlobalBackground";
 
-const { overridesStrategy, showInputHint, showOverrideUnsupportedTagWarning } = useSettings();
-const showHint = (v: any) => (showInputHint.value === ShowInputHint.Always ? true : v === "" || v === undefined);
+const { overridesStrategy, showInputHint, showOverrideUnsupportedTagWarning } =
+  useSettings();
+const showHint = (v: any) =>
+  showInputHint.value === ShowInputHint.Always
+    ? true
+    : v === "" || v === undefined;
 
 const { selected, beforeSelectChange } = useMusicList();
 let originalTags: Record<string, any> | undefined;
@@ -25,7 +34,9 @@ const getTag = async (v?: Song) => {
   if (!v) return {};
   const tags = await v.getTags();
   originalTags = tags;
-  const transformed = Object.fromEntries(tags.map((t) => [t.label, t.value])) as Record<string, any>;
+  const transformed = Object.fromEntries(
+    tags.map((t) => [t.label, t.value])
+  ) as Record<string, any>;
   originalTags = transformed;
   return transformed;
 };
@@ -80,7 +91,10 @@ const isEmpty = (v: any) => {
   );
 };
 
-const [showSourcePop, SourcePop] = usePopcon<Partial<CommonTag>, Partial<CommonTag>>();
+const [showSourcePop, SourcePop] = usePopcon<
+  Partial<CommonTag>,
+  Partial<CommonTag>
+>();
 
 const canSearchOnline = computed(() => !isEmpty(inner));
 const toSearchOnline = async () => {
@@ -104,7 +118,10 @@ const toSearchOnline = async () => {
   notifyChange();
 };
 
-const [showLyricSourcePop, LyricSourcePop] = usePopcon<Partial<{ lyric: string }>, Partial<CommonTag>>();
+const [showLyricSourcePop, LyricSourcePop] = usePopcon<
+  Partial<{ lyric: string }>,
+  Partial<CommonTag>
+>();
 
 // const canSearchOnline = computed(() => !isEmpty(inner));
 const toSearchLyricOnline = async () => {
@@ -139,7 +156,9 @@ const toSave = async () => {
       const options = ["Continue", "Cancel", "Continue and don't show again"];
       const conti = await alert({
         title: "Some tag will be override, still continue?",
-        subtitle: `These tags will be removed or replaced: ${diffs.map((v) => `${v.id}`).join(", ")}`,
+        subtitle: `These tags will be removed or replaced: ${diffs
+          .map((v) => `${v.id}`)
+          .join(", ")}`,
         options,
       });
       if (!conti || conti === options[1]) {
@@ -161,36 +180,54 @@ const toSave = async () => {
   }
 };
 
-// useGlobalBackground(() => inner.cover)
-const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricSource, setSelectedLyricSource } =
-  useSources();
+useGlobalBackground(() => inner.cover);
+const {
+  selectedSource,
+  setSelectedSource,
+  sources,
+  lyricSources,
+  selectedLyricSource,
+  setSelectedLyricSource,
+} = useSources();
 </script>
 <template>
   <template v-if="selected">
-    <div class="w-full flex gap-2 p-2 justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]">
+    <div
+      class="w-full flex gap-2 p-2 justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]"
+    >
       <div class="flex items-center">
         <button
           class="icon-button"
           data-size="large"
           :disabled="!canSearchOnline"
           @click="toSearchOnline"
-          title="search online">
+          title="search online"
+        >
           <div class="i-md:screen-search-desktop-outline-rounded"></div>
         </button>
         <select
-          class="text-xs outline-none text-text underline"
+          class="text-xs outline-none underline"
           :value="selectedSource.id"
           @change="
             (v) => {
               setSelectedSource((v.target as any)?.value);
             }
-          ">
+          "
+        >
           <option value="" disabled>select default source</option>
-          <option v-for="source in sources" :key="source.id" :value="source.id">{{ source.title }}</option>
+          <option v-for="source in sources" :key="source.id" :value="source.id">
+            {{ source.title }}
+          </option>
         </select>
       </div>
       <div class="flex gap-2">
-        <button class="icon-button" data-size="large" :disabled="!isInnerDirty" @click="toReset" title="reset">
+        <button
+          class="icon-button"
+          data-size="large"
+          :disabled="!isInnerDirty"
+          @click="toReset"
+          title="reset"
+        >
           <div class="i-md:refresh"></div>
         </button>
         <button
@@ -198,21 +235,33 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
           data-size="large"
           :disabled="!isInnerDirty"
           @click="toSave"
-          title="save">
+          title="save"
+        >
           <div class="i-md:save-outline-rounded"></div>
         </button>
       </div>
     </div>
     <div class="w-full flex-1 overflow-y-auto p-2">
-      <div v-if="!isLoadFailed" class="w-full flex flex-col items-center gap-2 text-sm">
+      <div
+        v-if="!isLoadFailed"
+        class="w-full flex flex-col items-center gap-2 text-sm"
+      >
         <div class="song-form-item">
           <div>Cover:</div>
-          <SingleImagePicker v-model="inner.cover" @change="notifyChange" class="!w-[150px] h-[150px]" />
+          <SingleImagePicker
+            v-model="inner.cover"
+            @change="notifyChange"
+            class="!w-[150px] h-[150px]"
+          />
         </div>
         <div class="song-form-item">
           <div>Title:</div>
           <Tooltip direction="top">
-            <input v-model="inner.title" @change="notifyChange" class="w-full rounded" />
+            <input
+              v-model="inner.title"
+              @change="notifyChange"
+              class="w-full rounded-lg"
+            />
             <template #tooltip v-if="showHint(inner.title)">
               <WordSplitter
                 :text="selected.name"
@@ -221,14 +270,19 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
                     inner.title = (inner.title ?? '') + v;
                     notifyChange();
                   }
-                " />
+                "
+              />
             </template>
           </Tooltip>
         </div>
         <div class="song-form-item">
           <div>Artist:</div>
           <Tooltip direction="top">
-            <input v-model="inner.artist" @change="notifyChange" class="w-full rounded" />
+            <input
+              v-model="inner.artist"
+              @change="notifyChange"
+              class="w-full rounded-lg"
+            />
             <template #tooltip v-if="showHint(inner.artist)">
               <WordSplitter
                 :text="selected.name"
@@ -237,14 +291,19 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
                     inner.artist = (inner.artist ?? '') + v;
                     notifyChange();
                   }
-                " />
+                "
+              />
             </template>
           </Tooltip>
         </div>
         <div class="song-form-item">
           <div>Album:</div>
           <Tooltip direction="top">
-            <input v-model="inner.album" @change="notifyChange" class="w-full rounded" />
+            <input
+              v-model="inner.album"
+              @change="notifyChange"
+              class="w-full rounded-lg"
+            />
             <template #tooltip v-if="showHint(inner.album)">
               <WordSplitter
                 :text="selected.name"
@@ -253,16 +312,26 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
                     inner.album = (inner.album ?? '') + v;
                     notifyChange();
                   }
-                " />
+                "
+              />
             </template>
           </Tooltip>
         </div>
         <div class="song-form-item">
           <div>Lyrics:</div>
-          <textarea v-model="inner.lyric" @change="notifyChange" class="h-[150px] resize-none" />
+          <textarea
+            v-model="inner.lyric"
+            @change="notifyChange"
+            class="h-[150px] resize-none rounded-lg"
+          />
           <div class="flex flex-col items-center gap-2">
-            <button class="button" @click="toSearchLyricOnline">search lyric</button>
-            <div class="flex items-center gap-2 text-xs text-text">
+            <button class="button" @click="toSearchLyricOnline">
+              <div class="flex items-center gap-2">
+                search lyric
+                <div class="i-md:search"></div>
+              </div>
+            </button>
+            <div class="flex items-center gap-2 text-xs">
               <div>lyric source:</div>
               <select
                 class="outline-none underline"
@@ -271,20 +340,36 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
             (v) => {
               setSelectedLyricSource((v as any).value);
             }
-          ">
+          "
+              >
                 <option value="" disabled>select</option>
-                <option v-for="source in lyricSources" :key="source.id" :value="source.id">{{ source.title }}</option>
+                <option
+                  v-for="source in lyricSources"
+                  :key="source.id"
+                  :value="source.id"
+                >
+                  {{ source.title }}
+                </option>
               </select>
             </div>
           </div>
         </div>
         <div class="song-form-item">
           <div>Comment:</div>
-          <textarea v-model="inner.comment" @change="notifyChange" class="w-full rounded resize-none" />
-          <div class="text-[10px] text-gray">some source may use comment to store id</div>
+          <textarea
+            v-model="inner.comment"
+            @change="notifyChange"
+            class="w-full rounded-lg resize-none"
+          />
+          <div class="text-[10px] text-white text-opacity-60">
+            some source may use comment to store id
+          </div>
         </div>
       </div>
-      <div v-else class="w-full flex-1 flex flex-col justify-center items-center">
+      <div
+        v-else
+        class="w-full flex-1 flex flex-col justify-center items-center"
+      >
         <div class="i-md:error-outline-rounded w-[32px] h-[32px]"></div>
         <div>Load music failed</div>
       </div>
@@ -305,7 +390,7 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
 
 <style scoped>
 .song-form-item {
-  @apply w-full flex flex-col justify-center items-center gap-1 [&>:first-child]:(text-gray text-xs text-right) [&>:nth-child(2)]:(rounded min-w-[150px] w-[50%] max-w[220px]);
+  @apply w-full flex flex-col justify-center items-center gap-1 [&>:first-child]:(text-white text-opacity-60 text-xs text-right) [&>:nth-child(2)]:(rounded min-w-[150px] w-[50%] max-w[220px]);
 }
 
 input,

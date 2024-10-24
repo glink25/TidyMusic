@@ -41,7 +41,9 @@ const computedList = computed(() => {
       return (
         song.name.toLowerCase().includes(keyword) ||
         (song.syncGetTags()?.some((t) => {
-          const r = ["title", "artist"].includes(t.label) && t.value?.toLowerCase?.().includes(keyword);
+          const r =
+            ["title", "artist"].includes(t.label) &&
+            t.value?.toLowerCase?.().includes(keyword);
           return r;
         }) ??
           false)
@@ -49,7 +51,11 @@ const computedList = computed(() => {
     }),
     [
       (o) => {
-        return o.syncGetTags()?.filter((t) => t.value !== undefined && t.value !== "").length ?? 0;
+        return (
+          o
+            .syncGetTags()
+            ?.filter((t) => t.value !== undefined && t.value !== "").length ?? 0
+        );
       },
 
       "name",
@@ -70,9 +76,16 @@ const [showSettings, SettingsPop] = usePopcon();
 const [showAutoFixer, AutoFixerPop] = usePopcon();
 </script>
 <template>
-  <div class="p-2 flex justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]">
+  <div
+    class="p-2 flex justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]"
+  >
     <div class="flex">
-      <button @click="chooseFolder" class="icon-button" data-size="large" title="import songs from folder">
+      <button
+        @click="chooseFolder"
+        class="icon-button"
+        data-size="large"
+        title="import songs from folder"
+      >
         <div class="i-md:drive-file-move-outline-rounded"></div>
       </button>
     </div>
@@ -81,33 +94,51 @@ const [showAutoFixer, AutoFixerPop] = usePopcon();
         @click="showAutoFixer"
         class="icon-button hidden"
         data-size="large"
-        title="apply online sources for all songs automatically">
+        title="apply online sources for all songs automatically"
+      >
         <div class="i-md:auto-fix-outline"></div>
       </button>
-      <button @click="showSettings" class="icon-button" data-size="large" title="settings">
+      <button
+        @click="showSettings"
+        class="icon-button"
+        data-size="large"
+        title="settings"
+      >
         <div class="i-md:settings-rounded"></div>
       </button>
     </div>
   </div>
-  <div class="p-2 flex-1 overflow-hidden w-full">
-    <div class="pt-1 pb-2 px-1 flex gap-2 items-center w-full overflow-hidden">
+  <div class="flex-1 w-full flex flex-col overflow-hidden">
+    <div class="pt-1 pb-2 px-3 flex gap-2 items-center w-full overflow-hidden">
       <div class="flex-1">
         <input
           type="text"
           v-model="filterText"
-          class="text-sm border rounded px-2 py-1 w-full bg-transparent"
-          placeholder="filter" />
+          class="text-sm border rounded-lg px-2 py-1 w-full border-white border-opacity-60 bg-transparent placeholder-[rgba(255,255,255,0.6)]"
+          placeholder="filter"
+        />
       </div>
       <button
         class="icon-button"
         data-size="small"
-        :title="textSortAscent ? 'Sort in ascending by name' : 'Sort in descending by name'"
+        :title="
+          textSortAscent
+            ? 'Sort in ascending by name'
+            : 'Sort in descending by name'
+        "
         @click="
           () => {
             textSortAscent = !textSortAscent;
           }
-        ">
-        <div :class="[textSortAscent ? 'i-tb:sort-ascending-letters' : 'i-tb:sort-descending-letters']"></div>
+        "
+      >
+        <div
+          :class="[
+            textSortAscent
+              ? 'i-tb:sort-ascending-letters'
+              : 'i-tb:sort-descending-letters',
+          ]"
+        ></div>
       </button>
       <button
         class="icon-button"
@@ -121,30 +152,49 @@ const [showAutoFixer, AutoFixerPop] = usePopcon();
           () => {
             metaFullAscent = !metaFullAscent;
           }
-        ">
-        <div :class="[metaFullAscent ? 'i-tb:sort-ascending-small-big' : 'i-tb:sort-descending-small-big']"></div>
+        "
+      >
+        <div
+          :class="[
+            metaFullAscent
+              ? 'i-tb:sort-ascending-small-big'
+              : 'i-tb:sort-descending-small-big',
+          ]"
+        ></div>
       </button>
     </div>
-    <div class="h-full overflow-y-auto">
+    <div class="flex-1 overflow-y-auto px-2">
       <template v-if="computedList.length">
         <template v-for="item in computedList" :key="item.path">
           <div
             class="px-2 cursor-pointer text-sm rounded"
-            :class="[selected?.path === item.path && 'bg-primary']"
-            :title="item.path">
+            :class="[
+              selected?.path === item.path &&
+                'bg-primary bg-opacity-90 backdrop-blur-lg',
+            ]"
+            :title="item.path"
+          >
             <div class="whitespace-nowrap">
-              <div class="py-2 overflow-hidden text-ellipsis" @click="() => toSelect(item.path)">
+              <div
+                class="py-2 overflow-hidden text-ellipsis"
+                @click="() => toSelect(item.path)"
+              >
                 {{ item.name }}
               </div>
-              <hr :class="[selected?.path === item.path && 'opacity-0']" />
             </div>
           </div>
         </template>
       </template>
-      <div v-else-if="list.length" class="w-full h-full text-text text-sm flex justify-center items-center pb-[50%]">
+      <div
+        v-else-if="list.length"
+        class="w-full h-full font-semibold flex justify-center items-center pb-[50%]"
+      >
         No result
       </div>
-      <div v-else class="w-full h-full text-text text-sm flex justify-center items-center pb-[50%]">
+      <div
+        v-else
+        class="w-full h-full font-semibold flex justify-center items-center pb-[50%]"
+      >
         Start to import music
       </div>
     </div>
