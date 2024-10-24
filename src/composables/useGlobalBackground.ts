@@ -5,7 +5,7 @@ export default function useGlobalBackground(watcher: () => string | undefined) {
     document.body.style.removeProperty("background");
   };
   const setBg = (src: string) => {
-    document.body.style.background = `center / cover no-repeat url(${src}) `;
+    document.body.style.background = `center / 200% no-repeat url(${src}) `;
   };
   watch(watcher, (src) => {
     if (!src) {

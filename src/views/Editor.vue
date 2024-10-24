@@ -15,6 +15,7 @@ import WordSplitter from "@/components/WordSplitter.vue";
 import LyricSource from "./LyricSource.vue";
 import { OverridesStrategy, ShowInputHint, useSettings } from "@/composables/useStorage";
 import { useSources } from "@/composables/useSources";
+import useGlobalBackground from "@/composables/useGlobalBackground";
 
 const { overridesStrategy, showInputHint, showOverrideUnsupportedTagWarning } = useSettings();
 const showHint = (v: any) => (showInputHint.value === ShowInputHint.Always ? true : v === "" || v === undefined);
@@ -161,7 +162,7 @@ const toSave = async () => {
   }
 };
 
-// useGlobalBackground(() => inner.cover)
+useGlobalBackground(() => inner.cover);
 const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricSource, setSelectedLyricSource } =
   useSources();
 </script>

@@ -15,7 +15,7 @@ const themes = {
   light: {
     colors: {
       primary: "#facc15",
-      text: "#000",
+      text: "#fff",
       icon: "rgba(116,115,115,1)",
       bg: "#fff",
     },
