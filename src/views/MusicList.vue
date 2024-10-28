@@ -10,7 +10,8 @@ import { orderBy } from "lodash-es";
 import { toasts } from "@/composables/useToast";
 import { Menu, MenuItem } from "@tauri-apps/api/menu";
 import { invoke } from "@tauri-apps/api/core";
-
+import { useI18n } from "vue-i18n";
+const { t: $t } = useI18n();
 const { list, addMusic, removeMusic, selected, toSelect } = useMusicList();
 const chooseFolder = async () => {
   await recursiveOpen(async (file) => {
@@ -75,7 +76,7 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
   const options = [
     {
       id: "reveal",
-      text: "Reveal in finder",
+      text: $t("reveal-in-finder"),
       action: async () => {
         await invoke("showfile", {
           path: item.path,
@@ -84,7 +85,7 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
     },
     {
       id: "remove",
-      text: "Remove form list",
+      text: $t("remove-form-list"),
       action: async () => {
         removeMusic(item.path);
       },
@@ -103,7 +104,7 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
 <template>
   <div class="p-2 flex justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]">
     <div class="flex">
-      <button @click="chooseFolder" class="icon-button" data-size="large" title="import songs from folder">
+      <button @click="chooseFolder" class="icon-button" data-size="large" :title="$t('import-songs-from-folder')">
         <div class="i-md:drive-file-move-outline-rounded"></div>
       </button>
     </div>
@@ -112,7 +113,7 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
         @click="showAutoFixer"
         class="icon-button hidden"
         data-size="large"
-        title="apply online sources for all songs automatically">
+        :title="$t('apply-online-sources-for-all-songs-automatically')">
         <div class="i-md:auto-fix-outline"></div>
       </button>
       <button @click="showSettings" class="icon-button" data-size="large" title="settings">
@@ -127,12 +128,12 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
           type="text"
           v-model="filterText"
           class="text-sm border rounded-lg px-2 py-1 w-full border-white border-opacity-60 bg-transparent placeholder-[rgba(255,255,255,0.6)]"
-          placeholder="filter" />
+          :placeholder="$t('filter')" />
       </div>
       <button
         class="icon-button"
         data-size="small"
-        :title="textSortAscent ? 'Sort in ascending by name' : 'Sort in descending by name'"
+        :title="textSortAscent ? $t('sort-in-ascending-by-name') : $t('sort-in-descending-by-name')"
         @click="
           () => {
             textSortAscent = !textSortAscent;
@@ -145,8 +146,8 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
         data-size="small"
         :title="
           metaFullAscent
-            ? 'Sort in ascending order by tag completeness'
-            : 'Sort in descending order by tag completeness'
+            ? $t('sort-in-ascending-order-by-tag-completeness')
+            : $t('sort-in-descending-order-by-tag-completeness')
         "
         @click="
           () => {
@@ -175,10 +176,10 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
         </template>
       </template>
       <div v-else-if="list.length" class="w-full h-full font-semibold flex justify-center items-center pb-[50%]">
-        No result
+        {{ $t("no-result") }}
       </div>
       <div v-else class="w-full h-full font-semibold flex justify-center items-center pb-[50%]">
-        Start to import music
+        {{ $t("start-to-import-music") }}
       </div>
     </div>
   </div>

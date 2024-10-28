@@ -8,7 +8,8 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "gen-icon": "pnpm tauri icon ./public/icon.png"
+    "gen-icon": "pnpm tauri icon ./public/icon.png",
+    "build:app": "pnpm tauri build --bundles app"
   },
   "dependencies": {
     "@tauri-apps/api": ">=2.0.0",
@@ -22,7 +23,8 @@
     "lodash-es": "^4.17.21",
     "mime-types": "^2.1.35",
     "music-metadata": "^10.5.0",
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "vue-i18n": "10"
   },
   "devDependencies": {
     "@iconify-json/material-symbols": "^1.2.5",

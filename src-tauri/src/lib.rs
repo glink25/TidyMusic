@@ -1,10 +1,5 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
-#[tauri::command]
 fn showfile(path: &str) {
     showfile::show_path_in_file_manager(path);
 }

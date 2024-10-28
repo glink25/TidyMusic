@@ -13,20 +13,13 @@ import SingleImagePicker from "@/components/SingleImagePicker.vue";
 import Tooltip from "@/components/Tooltip.vue";
 import WordSplitter from "@/components/WordSplitter.vue";
 import LyricSource from "./LyricSource.vue";
-import {
-  OverridesStrategy,
-  ShowInputHint,
-  useSettings,
-} from "@/composables/useStorage";
+import { OverridesStrategy, ShowInputHint, useSettings } from "@/composables/useStorage";
 import { useSources } from "@/composables/useSources";
 import useGlobalBackground from "@/composables/useGlobalBackground";
-
-const { overridesStrategy, showInputHint, showOverrideUnsupportedTagWarning } =
-  useSettings();
-const showHint = (v: any) =>
-  showInputHint.value === ShowInputHint.Always
-    ? true
-    : v === "" || v === undefined;
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+const { overridesStrategy, showInputHint, showOverrideUnsupportedTagWarning } = useSettings();
+const showHint = (v: any) => (showInputHint.value === ShowInputHint.Always ? true : v === "" || v === undefined);
 
 const { selected, beforeSelectChange } = useMusicList();
 let originalTags: Record<string, any> | undefined;
@@ -34,9 +27,7 @@ const getTag = async (v?: Song) => {
   if (!v) return {};
   const tags = await v.getTags();
   originalTags = tags;
-  const transformed = Object.fromEntries(
-    tags.map((t) => [t.label, t.value])
-  ) as Record<string, any>;
+  const transformed = Object.fromEntries(tags.map((t) => [t.label, t.value])) as Record<string, any>;
   originalTags = transformed;
   return transformed;
 };
@@ -74,8 +65,8 @@ const [alert, AlertWrapper] = useAlert();
 beforeSelectChange(async () => {
   if (isInnerDirty.value) {
     const leave = await alert({
-      title: "Changed not saved, Are you sure to leave?",
-      options: ["Still leave", "Cancel"],
+      title: t("changed-not-saved-are-you-sure-to-leave"),
+      options: [t("still-leave"), t("cancel")],
     });
     return leave;
   }
@@ -91,10 +82,7 @@ const isEmpty = (v: any) => {
   );
 };
 
-const [showSourcePop, SourcePop] = usePopcon<
-  Partial<CommonTag>,
-  Partial<CommonTag>
->();
+const [showSourcePop, SourcePop] = usePopcon<Partial<CommonTag>, Partial<CommonTag>>();
 
 const canSearchOnline = computed(() => !isEmpty(inner));
 const toSearchOnline = async () => {
@@ -118,10 +106,7 @@ const toSearchOnline = async () => {
   notifyChange();
 };
 
-const [showLyricSourcePop, LyricSourcePop] = usePopcon<
-  Partial<{ lyric: string }>,
-  Partial<CommonTag>
->();
+const [showLyricSourcePop, LyricSourcePop] = usePopcon<Partial<{ lyric: string }>, Partial<CommonTag>>();
 
 // const canSearchOnline = computed(() => !isEmpty(inner));
 const toSearchLyricOnline = async () => {
@@ -137,7 +122,7 @@ const toSearchLyricOnline = async () => {
 };
 
 const toReset = () => {
-  toasts.success("Rest success");
+  toasts.success(t("rest-success"));
   if (!originalTags) {
     return;
   }
@@ -153,12 +138,10 @@ const toSave = async () => {
     if (!canSafeUpdate && showOverrideUnsupportedTagWarning.value) {
       loadings.dismiss();
       console.log("diffs:", diffs);
-      const options = ["Continue", "Cancel", "Continue and don't show again"];
+      const options = [t("continue"), t("cancel"), t("continue-and-dont-show-again")];
       const conti = await alert({
-        title: "Some tag will be override, still continue?",
-        subtitle: `These tags will be removed or replaced: ${diffs
-          .map((v) => `${v.id}`)
-          .join(", ")}`,
+        title: t("some-tag-will-be-override-still-continue"),
+        subtitle: t("these-tags-will-be-removed-or-replaced", diffs.map((v) => `${v.id}`).join(", ")),
         options,
       });
       if (!conti || conti === options[1]) {
@@ -171,38 +154,29 @@ const toSave = async () => {
     const newBuffer = await next();
     await saveFile(song.path, newBuffer);
     isInnerDirty.value = false;
-    toasts.success("save success");
+    toasts.success(t("save-success"));
   } catch (error) {
     console.error(error);
-    toasts.error(`save failed: ${error}`);
+    toasts.error(t("save-failed-error", [error]));
   } finally {
     loadings.dismiss();
   }
 };
 
 useGlobalBackground(() => inner.cover);
-const {
-  selectedSource,
-  setSelectedSource,
-  sources,
-  lyricSources,
-  selectedLyricSource,
-  setSelectedLyricSource,
-} = useSources();
+const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricSource, setSelectedLyricSource } =
+  useSources();
 </script>
 <template>
   <template v-if="selected">
-    <div
-      class="w-full flex gap-2 p-2 justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]"
-    >
+    <div class="w-full flex gap-2 p-2 justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]">
       <div class="flex items-center">
         <button
           class="icon-button"
           data-size="large"
           :disabled="!canSearchOnline"
           @click="toSearchOnline"
-          title="search online"
-        >
+          :title="$t('search-online')">
           <div class="i-md:screen-search-desktop-outline-rounded"></div>
         </button>
         <select
@@ -212,22 +186,15 @@ const {
             (v) => {
               setSelectedSource((v.target as any)?.value);
             }
-          "
-        >
-          <option value="" disabled>select default source</option>
+          ">
+          <option value="" disabled>{{ $t("select-default-source") }}</option>
           <option v-for="source in sources" :key="source.id" :value="source.id">
             {{ source.title }}
           </option>
         </select>
       </div>
       <div class="flex gap-2">
-        <button
-          class="icon-button"
-          data-size="large"
-          :disabled="!isInnerDirty"
-          @click="toReset"
-          title="reset"
-        >
+        <button class="icon-button" data-size="large" :disabled="!isInnerDirty" @click="toReset" title="reset">
           <div class="i-md:refresh"></div>
         </button>
         <button
@@ -235,33 +202,21 @@ const {
           data-size="large"
           :disabled="!isInnerDirty"
           @click="toSave"
-          title="save"
-        >
+          title="save">
           <div class="i-md:save-outline-rounded"></div>
         </button>
       </div>
     </div>
     <div class="w-full flex-1 overflow-y-auto p-2">
-      <div
-        v-if="!isLoadFailed"
-        class="w-full flex flex-col items-center gap-2 text-sm"
-      >
+      <div v-if="!isLoadFailed" class="w-full flex flex-col items-center gap-2 text-sm">
         <div class="song-form-item">
-          <div>Cover:</div>
-          <SingleImagePicker
-            v-model="inner.cover"
-            @change="notifyChange"
-            class="!w-[150px] h-[150px]"
-          />
+          <div>{{ $t("cover:") }}</div>
+          <SingleImagePicker v-model="inner.cover" @change="notifyChange" class="!w-[150px] h-[150px]" />
         </div>
         <div class="song-form-item">
-          <div>Title:</div>
+          <div>{{ $t("title:") }}</div>
           <Tooltip direction="top">
-            <input
-              v-model="inner.title"
-              @change="notifyChange"
-              class="w-full rounded-lg"
-            />
+            <input v-model="inner.title" @change="notifyChange" class="w-full rounded-lg" />
             <template #tooltip v-if="showHint(inner.title)">
               <WordSplitter
                 :text="selected.name"
@@ -270,19 +225,14 @@ const {
                     inner.title = (inner.title ?? '') + v;
                     notifyChange();
                   }
-                "
-              />
+                " />
             </template>
           </Tooltip>
         </div>
         <div class="song-form-item">
-          <div>Artist:</div>
+          <div>{{ $t("artist:") }}</div>
           <Tooltip direction="top">
-            <input
-              v-model="inner.artist"
-              @change="notifyChange"
-              class="w-full rounded-lg"
-            />
+            <input v-model="inner.artist" @change="notifyChange" class="w-full rounded-lg" />
             <template #tooltip v-if="showHint(inner.artist)">
               <WordSplitter
                 :text="selected.name"
@@ -291,19 +241,14 @@ const {
                     inner.artist = (inner.artist ?? '') + v;
                     notifyChange();
                   }
-                "
-              />
+                " />
             </template>
           </Tooltip>
         </div>
         <div class="song-form-item">
-          <div>Album:</div>
+          <div>{{ $t("album:") }}</div>
           <Tooltip direction="top">
-            <input
-              v-model="inner.album"
-              @change="notifyChange"
-              class="w-full rounded-lg"
-            />
+            <input v-model="inner.album" @change="notifyChange" class="w-full rounded-lg" />
             <template #tooltip v-if="showHint(inner.album)">
               <WordSplitter
                 :text="selected.name"
@@ -312,27 +257,22 @@ const {
                     inner.album = (inner.album ?? '') + v;
                     notifyChange();
                   }
-                "
-              />
+                " />
             </template>
           </Tooltip>
         </div>
         <div class="song-form-item">
-          <div>Lyrics:</div>
-          <textarea
-            v-model="inner.lyric"
-            @change="notifyChange"
-            class="h-[150px] resize-none rounded-lg"
-          />
+          <div>{{ $t("lyrics:") }}</div>
+          <textarea v-model="inner.lyric" @change="notifyChange" class="h-[150px] resize-none rounded-lg" />
           <div class="flex flex-col items-center gap-2">
             <button class="button" @click="toSearchLyricOnline">
               <div class="flex items-center gap-2">
-                search lyric
+                {{ $t("search-lyric") }}
                 <div class="i-md:search"></div>
               </div>
             </button>
             <div class="flex items-center gap-2 text-xs">
-              <div>lyric source:</div>
+              <div>{{ $t("lyric-source") }}</div>
               <select
                 class="outline-none underline"
                 :value="selectedLyricSource.id"
@@ -340,14 +280,9 @@ const {
             (v) => {
               setSelectedLyricSource((v as any).value);
             }
-          "
-              >
-                <option value="" disabled>select</option>
-                <option
-                  v-for="source in lyricSources"
-                  :key="source.id"
-                  :value="source.id"
-                >
+          ">
+                <option value="" disabled>{{ $t("select") }}</option>
+                <option v-for="source in lyricSources" :key="source.id" :value="source.id">
                   {{ source.title }}
                 </option>
               </select>
@@ -355,23 +290,14 @@ const {
           </div>
         </div>
         <div class="song-form-item">
-          <div>Comment:</div>
-          <textarea
-            v-model="inner.comment"
-            @change="notifyChange"
-            class="w-full rounded-lg resize-none"
-          />
-          <div class="text-[10px] text-white text-opacity-60">
-            some source may use comment to store id
-          </div>
+          <div>{{ $t("comment:") }}</div>
+          <textarea v-model="inner.comment" @change="notifyChange" class="w-full rounded-lg resize-none" />
+          <div class="text-[10px] text-white text-opacity-60">{{ $t("some-source-may-use-comment-to-store-id") }}</div>
         </div>
       </div>
-      <div
-        v-else
-        class="w-full flex-1 flex flex-col justify-center items-center"
-      >
+      <div v-else class="w-full flex-1 flex flex-col justify-center items-center">
         <div class="i-md:error-outline-rounded w-[32px] h-[32px]"></div>
-        <div>Load music failed</div>
+        <div>{{ $t("load-music-failed") }}</div>
       </div>
     </div>
   </template>
