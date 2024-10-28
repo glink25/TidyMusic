@@ -4,23 +4,14 @@ class CancelError extends Error {
   }
 }
 export default function abortable<T>(promise: Promise<T>) {
-  let _rej: ((err: any) => void) | undefined = undefined;
-  const abortable = new Promise((res, rej) => {
-    _rej = rej;
-    return promise
-      .then((v) => {
-        res(v);
-      })
-      .catch((err) => {
-        if (err instanceof CancelError) {
-          console.warn(err);
-          return;
-        }
-        rej(err);
-        return err;
-      });
+  let innerRej: ((err: any) => void) | undefined;
+  const controller = new Promise<T>((res, rej) => {
+    promise.then((v) => res(v)).catch(() => rej());
+    innerRej = rej;
   });
-  const abort = () => _rej?.(new CancelError());
+  const abort = () => innerRej?.(new CancelError());
 
-  return [abortable, abort] as const;
+  const pro = Promise.race([controller, promise]);
+
+  return [pro, abort] as const;
 }

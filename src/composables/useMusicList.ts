@@ -12,6 +12,9 @@ export const useMusicList = (() => {
     }
     list.value.push(item);
   };
+  const removeMusic = (path: string) => {
+    list.value.splice(list.value.findIndex((v) => v.path === path));
+  };
 
   const list = ref([] as Song[]);
 
@@ -40,6 +43,7 @@ export const useMusicList = (() => {
   return () => ({
     list,
     addMusic,
+    removeMusic,
     selected,
     toSelect,
     beforeSelectChange,

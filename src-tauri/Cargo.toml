@@ -27,4 +27,5 @@ tauri-plugin-fs = "2"
 tauri-plugin-http = "2"
 id3 = "1.14.0"
 tauri-plugin-store = "2"
+showfile = "0.1.1"
 
