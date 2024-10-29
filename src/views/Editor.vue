@@ -17,6 +17,7 @@ import { OverridesStrategy, ShowInputHint, useSettings } from "@/composables/use
 import { useSources } from "@/composables/useSources";
 import useGlobalBackground from "@/composables/useGlobalBackground";
 import { useI18n } from "vue-i18n";
+import { error, info } from "@/utils/log";
 const { t } = useI18n();
 const { overridesStrategy, showInputHint, showOverrideUnsupportedTagWarning } = useSettings();
 const showHint = (v: any) => (showInputHint.value === ShowInputHint.Always ? true : v === "" || v === undefined);
@@ -137,7 +138,7 @@ const toSave = async () => {
     const [canSafeUpdate, next, diffs] = await song.update(inner);
     if (!canSafeUpdate && showOverrideUnsupportedTagWarning.value) {
       loadings.dismiss();
-      console.log("diffs:", diffs);
+      info("diffs:", diffs);
       const options = [t("continue"), t("cancel"), t("continue-and-dont-show-again")];
       const conti = await alert({
         title: t("some-tag-will-be-override-still-continue"),
@@ -155,9 +156,9 @@ const toSave = async () => {
     await saveFile(song.path, newBuffer);
     isInnerDirty.value = false;
     toasts.success(t("save-success"));
-  } catch (error) {
-    console.error(error);
-    toasts.error(t("save-failed-error", [error]));
+  } catch (err) {
+    error(err);
+    toasts.error(t("save-failed-error", [err]));
   } finally {
     loadings.dismiss();
   }

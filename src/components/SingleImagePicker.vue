@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { pickFile } from "@/utils/fs";
+import { error } from "@/utils/log";
 
 defineProps<{
   modelValue?: string;
@@ -16,8 +17,8 @@ const onClick = async () => {
     const url = files[0];
     emit("update:modelValue", url);
     emit("change", url);
-  } catch (error) {
-    console.error("no file select", error);
+  } catch (err) {
+    error("no file select", err);
   }
 };
 

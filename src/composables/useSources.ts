@@ -3,6 +3,7 @@ import { LyricSourceBuilder } from "@/sources/helper";
 import { computed, ref } from "vue";
 import { useSettings } from "./useStorage";
 import { fetch } from "@tauri-apps/plugin-http";
+import { warn } from "@/utils/log";
 
 const wrappedFetch: typeof fetch = (...args) => fetch(...args);
 
@@ -17,7 +18,7 @@ export const useSources = (() => {
   const selectedSource = computed(() => sources.value.find((v) => v.id === selectedSourceId.value)!);
   const setSelectedSource = (id: any) => {
     if (sources.value.every((v) => v.id !== id)) {
-      console.warn("source id not exist");
+      warn("source id not exist");
       return;
     }
     selectedSourceId.value = id;
@@ -32,7 +33,7 @@ export const useSources = (() => {
   const selectedLyricSource = computed(() => lyricSources.value.find((v) => v.id === selectedLyricSourceId.value)!);
   const setSelectedLyricSource = (id: any) => {
     if (lyricSources.value.every((v) => v.id !== id)) {
-      console.warn("lyric source id not exist");
+      warn("lyric source id not exist");
       return;
     }
     selectedLyricSourceId.value = id;

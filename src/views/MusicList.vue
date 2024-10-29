@@ -11,6 +11,8 @@ import { toasts } from "@/composables/useToast";
 import { Menu, MenuItem } from "@tauri-apps/api/menu";
 import { invoke } from "@tauri-apps/api/core";
 import { useI18n } from "vue-i18n";
+import { error } from "@/utils/log";
+
 const { t: $t } = useI18n();
 const { list, addMusic, removeMusic, selected, toSelect } = useMusicList();
 const chooseFolder = async () => {
@@ -20,9 +22,9 @@ const chooseFolder = async () => {
     }
     try {
       await addMusic(file.fullpath, file.name, file.data);
-    } catch (error) {
-      console.error(error);
-      toasts.error(`${error}`);
+    } catch (err) {
+      error(err);
+      toasts.error(`${err}`);
     }
   });
 };
