@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import { useLoading } from "@/composables/useGlobalLoading";
 import { useSources } from "@/composables/useSources";
 import { toasts } from "@/composables/useToast";
 import { FindSongReturned } from "@/sources/helper";
-import useLoading from "@/ui/loading";
 import { CommonTag } from "@/utils/music";
 import { ref } from "vue";
 

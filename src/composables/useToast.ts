@@ -1,3 +1,3 @@
 import { useToastWrapper } from "@/ui/toast";
 
-export const [toasts,ToastWrapper]=  useToastWrapper()
+export const [toasts, ToastRoot] = useToastWrapper();

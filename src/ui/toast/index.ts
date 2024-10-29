@@ -2,15 +2,15 @@ import { computed, defineComponent, h, ref } from "vue";
 import Toast from "./Toast.vue";
 
 export enum ToastType {
-  info='info',
-  success='success',
-  error='error',
-  warning='warning'
+  info = "info",
+  success = "success",
+  error = "error",
+  warning = "warning",
 }
 export type ToastItem = {
   type: ToastType;
   content: string;
-  id: string | number
+  id: string | number;
 };
 
 const getId = (() => {
@@ -19,13 +19,13 @@ const getId = (() => {
 })();
 
 export const useToastWrapper = () => {
-  const list = ref<(ToastItem)[]>([]);
-  const TooltipWrapper = defineComponent(() => {
+  const list = ref<ToastItem[]>([]);
+  const ToastWrapper = defineComponent(() => {
     const _list = computed(() => list.value);
     return () => h(Toast, { list: _list.value });
   });
 
-  const show=(content: string, timeout = 3000, type: ToastType = ToastType.info) => {
+  const show = (content: string, timeout = 3000, type: ToastType = ToastType.info) => {
     const id = getId();
     list.value.push({
       content,
@@ -38,15 +38,14 @@ export const useToastWrapper = () => {
         1
       );
     }, timeout);
-  }
+  };
   const controller = {
     show,
-    success:(content:string,timeout = 3000)=>show(content,timeout,ToastType.success),
-    info:(content:string,timeout = 3000)=>show(content,timeout,ToastType.info),
-    warning:(content:string,timeout = 3000)=>show(content,timeout,ToastType.warning),
-    error:(content:string,timeout = 3000)=>show(content,timeout,ToastType.error)
-
+    success: (content: string, timeout = 3000) => show(content, timeout, ToastType.success),
+    info: (content: string, timeout = 3000) => show(content, timeout, ToastType.info),
+    warning: (content: string, timeout = 3000) => show(content, timeout, ToastType.warning),
+    error: (content: string, timeout = 3000) => show(content, timeout, ToastType.error),
   };
 
-  return [controller, TooltipWrapper] as const;
+  return [controller, ToastWrapper] as const;
 };

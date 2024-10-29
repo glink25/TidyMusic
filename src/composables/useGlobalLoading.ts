@@ -1,6 +1,7 @@
-import useLoading from "@/ui/loading";
+import createLoadings from "@/ui/loading";
 
-const { controller, LoadingWrapper } = useLoading(true);
-export const loadings = controller;
+const { LoadingRoot, useLoading } = createLoadings();
 
-export { LoadingWrapper };
+export const { controller: loadings } = useLoading(true);
+
+export { LoadingRoot, useLoading };
