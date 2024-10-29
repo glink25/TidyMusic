@@ -38,46 +38,34 @@ const toApply = () => {
 </script>
 <template>
   <div ref="domRef" class="w-[240px] overflow-hidden p-2 flex flex-col gap-2">
-    <div class="h-8 flex items-center">Detail</div>
+    <div class="h-8 flex items-center">{{ $t("detail") }}</div>
     <div v-if="detail" class="flex flex-col items-center gap-2">
-      <img
-        v-if="detail.cover"
-        :src="detail.cover"
-        alt=""
-        class="w-[120px] h-[120px]"
-      />
+      <img v-if="detail.cover" :src="detail.cover" alt="" class="w-[120px] h-[120px]" />
       <div class="flex flex-col items-center">
-        <div class="text-xs pb-1">title:</div>
+        <div class="text-xs pb-1">{{ $t("title:") }}</div>
         <div class="text-sm rounded px-2 py-1 sinked">
           {{ detail.title }}
         </div>
       </div>
       <div class="flex flex-col items-center">
-        <div class="text-xs pb-1">artist:</div>
+        <div class="text-xs pb-1">{{ $t("artist:") }}</div>
         <div class="text-sm rounded px-2 py-1 sinked">{{ detail.artist }}</div>
       </div>
       <div class="flex flex-col items-center">
-        <div class="text-xs pb-1">album:</div>
+        <div class="text-xs pb-1">{{ $t("album:") }}</div>
         <div class="text-sm rounded px-2 py-1 sinked">{{ detail.album }}</div>
       </div>
       <div class="max-h-[120px] flex flex-col items-center">
-        <div class="text-xs pb-1">lyric:</div>
+        <div class="text-xs pb-1">{{ $t("lyric:") }}</div>
         <div class="flex-1 overflow-y-auto text-sm rounded p-2 sinked">
           {{ detail.lyric }}
         </div>
       </div>
       <div class="flex gap-2 text-xs">
-        <button class="button" @click="toCancel">Cancel</button>
-        <button class="button" data-type="primary" @click="toApply">
-          Apply
-        </button>
+        <button class="button" @click="toCancel">{{ $t("cancel") }}</button>
+        <button class="button" data-type="primary" @click="toApply">{{ $t("apply") }}</button>
       </div>
     </div>
-    <div
-      v-else-if="!isLoading"
-      class="w-full h-full flex justify-center items-center"
-    >
-      No results
-    </div>
+    <div v-else-if="!isLoading" class="w-full h-full flex justify-center items-center">{{ $t("no-results") }}</div>
   </div>
 </template>

@@ -33,21 +33,15 @@ const toApply = (result: any) => {
 </script>
 <template>
   <div ref="loadingRef" class="overflow-hidden h-full flex flex-col">
-    <div class="h-8 p-2">Search Results:</div>
-    <div
-      class="flex-1 min-w-[300px] w-[80vw] max-w[500px] flex flex-col overflow-y-auto"
-    >
+    <div class="h-8 p-2">{{ $t("search-results") }}</div>
+    <div class="flex-1 min-w-[300px] w-[80vw] max-w[500px] flex flex-col overflow-y-auto">
       <template v-for="(result, index) in searchResults" :key="index">
         <div class="flex p-2 gap-2 items-center">
-          <div
-            class="flex-1 h-20 rounded border p-1 overflow-y-auto whitespace-pre"
-          >
+          <div class="flex-1 h-20 rounded border p-1 overflow-y-auto whitespace-pre">
             {{ result.lyric }}
           </div>
           <div class="flex-shrink-0 text-xs">
-            <button data-type="primary" class="button" @click="toApply(result)">
-              Apply
-            </button>
+            <button data-type="primary" class="button" @click="toApply(result)">{{ $t("apply") }}</button>
           </div>
         </div>
         <hr />

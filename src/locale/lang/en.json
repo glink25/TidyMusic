@@ -41,5 +41,14 @@
   "reset-to-defaults": "Reset to defaults",
   "version-version": "version: {0}",
   "empty-only": "Empty-Only",
-  "cover:": "Cover:"
+  "cover:": "Cover:",
+  "search-results": "Search Results:",
+  "artist-result-song-artist": "artist: {0}",
+  "album-result-song-album": "album: {0}",
+  "more": "More",
+  "apply": "Apply",
+  "no-results": "No results",
+  "detail": "Detail",
+  "select-words": "select words:",
+  "loading": "Loading..."
 }

@@ -33,5 +33,22 @@
   "these-tags-will-be-removed-or-replaced": "这些标签将被移除或被覆盖：",
   "title:": "标题：",
   "settings": "设置",
-  "cover:": "封面："
+  "cover:": "封面：",
+  "album-result-song-album": "专辑：",
+  "always": "始终",
+  "apply": "应用",
+  "artist-result-song-artist": "艺人：",
+  "detail": "详情",
+  "empty-only": "仅空数据",
+  "more": "更多",
+  "no-results": "无结果",
+  "override-all": "覆盖所有",
+  "override-strategy": "覆写策略",
+  "reset-to-defaults": "重设为默认值",
+  "search-results": "搜索结果",
+  "select-an-option": "选取一项",
+  "show-input-hint": "展示输入提示",
+  "version-version": "版本：{0}",
+  "select-words": "选词填入：",
+  "loading": "加载中..."
 }
