@@ -12,21 +12,48 @@ import { Menu, MenuItem } from "@tauri-apps/api/menu";
 import { invoke } from "@tauri-apps/api/core";
 import { useI18n } from "vue-i18n";
 import { error } from "@/utils/log";
+import useKeyboard from "@/composables/useKeyboard";
 
 const { t: $t } = useI18n();
 const { list, addMusic, removeMusic, selected, toSelect } = useMusicList();
+
+const keyboardRef = useKeyboard((e) => {
+  const curIndex = computedList.value.findIndex((v) => selected.value?.path === v.path);
+  if (e.key === "ArrowDown") {
+    const nextIndex = curIndex >= computedList.value.length - 1 ? 0 : curIndex + 1;
+    const dom = keyboardRef.value?.querySelector<HTMLElement>(`[data-song-index="${nextIndex}"]`);
+    dom?.click();
+    dom?.focus();
+  }
+  if (e.key === "ArrowUp") {
+    const nextIndex = curIndex <= 0 ? 0 : curIndex - 1;
+    const dom = keyboardRef.value?.querySelector<HTMLElement>(`[data-song-index="${nextIndex}"]`);
+    dom?.click();
+    dom?.focus();
+  }
+});
+
+const importing = ref(false);
 const chooseFolder = async () => {
-  await recursiveOpen(async (file) => {
-    if (!isMusic(file.name)) {
-      return;
-    }
-    try {
-      await addMusic(file.fullpath, file.name, file.data);
-    } catch (err) {
-      error(err);
-      toasts.error(`${err}`);
-    }
-  });
+  importing.value = true;
+  try {
+    await recursiveOpen(async (file) => {
+      if (!isMusic(file.name)) {
+        return;
+      }
+      try {
+        await addMusic(file.fullpath, file.name, file.data);
+      } catch (err) {
+        error(err);
+        toasts.error(`${err}`);
+      }
+    });
+    const dom = keyboardRef.value?.querySelector<HTMLElement>(`[data-song-index="${0}"]`);
+    dom?.click();
+    dom?.focus();
+  } finally {
+    importing.value = false;
+  }
 };
 
 // 按标题、名称、作者过滤文本
@@ -107,7 +134,8 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
   <div class="p-2 flex justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]">
     <div class="flex">
       <button @click="chooseFolder" class="icon-button" data-size="large" :title="$t('import-songs-from-folder')">
-        <div class="i-md:drive-file-move-outline-rounded"></div>
+        <div v-if="!importing" class="i-md:drive-file-move-outline-rounded"></div>
+        <div v-else class="i-svg-spinners:180-ring"></div>
       </button>
     </div>
     <div class="flex gap-2">
@@ -141,7 +169,7 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
             textSortAscent = !textSortAscent;
           }
         ">
-        <div :class="[textSortAscent ? 'i-tb:sort-ascending-letters' : 'i-tb:sort-descending-letters']"></div>
+        <div :class="[textSortAscent ? 'i-tabler:sort-ascending-letters' : 'i-tabler:sort-descending-letters']"></div>
       </button>
       <button
         class="icon-button"
@@ -156,17 +184,20 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
             metaFullAscent = !metaFullAscent;
           }
         ">
-        <div :class="[metaFullAscent ? 'i-tb:sort-ascending-small-big' : 'i-tb:sort-descending-small-big']"></div>
+        <div
+          :class="[metaFullAscent ? 'i-tabler:sort-ascending-small-big' : 'i-tabler:sort-descending-small-big']"></div>
       </button>
     </div>
-    <div class="flex-1 overflow-y-auto px-2">
+    <div ref="keyboardRef" class="flex-1 overflow-y-auto px-2" tabindex="-1">
       <template v-if="computedList.length">
-        <template v-for="item in computedList" :key="item.path">
-          <div
-            class="px-2 cursor-pointer text-sm rounded transition-all hover:bg-[rgba(0,0,0,0.2)]"
+        <template v-for="(item, index) in computedList" :key="item.path">
+          <button
+            class="flex w-full px-2 cursor-pointer text-sm rounded transition-all hover:bg-[rgba(0,0,0,0.2)] focus:bg-[rgba(0,0,0,0.2)] outline-none"
             data-allow-contextmenu
+            :data-song-index="index"
             :class="[selected?.path === item.path && '!bg-primary bg-opacity-90 backdrop-blur-lg']"
             :title="item.path"
+            tabindex="0"
             @click="() => toSelect(item.path)"
             @contextmenu.prevent="() => showContextMenu(item)">
             <div data-allow-contextmenu class="whitespace-nowrap">
@@ -174,7 +205,7 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
                 {{ item.name }}
               </div>
             </div>
-          </div>
+          </button>
         </template>
       </template>
       <div v-else-if="list.length" class="w-full h-full font-semibold flex justify-center items-center pb-[50%]">

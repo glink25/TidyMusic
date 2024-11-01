@@ -34,9 +34,9 @@ export default defineConfig({
       },
     }),
     presetIcons({
+      autoInstall: true,
       collections: {
         md: () => loadJSON("node_modules/@iconify-json/material-symbols/icons.json"),
-        tb: () => loadJSON("node_modules/@iconify-json/tabler/icons.json"),
       },
     }),
     // ...other presets
