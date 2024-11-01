@@ -163,9 +163,9 @@ const showContextMenu = async (item: (typeof computedList)["value"][number]) => 
       <template v-if="computedList.length">
         <template v-for="item in computedList" :key="item.path">
           <div
-            class="px-2 cursor-pointer text-sm rounded"
+            class="px-2 cursor-pointer text-sm rounded transition-all hover:bg-[rgba(0,0,0,0.2)]"
             data-allow-contextmenu
-            :class="[selected?.path === item.path && 'bg-primary bg-opacity-90 backdrop-blur-lg']"
+            :class="[selected?.path === item.path && '!bg-primary bg-opacity-90 backdrop-blur-lg']"
             :title="item.path"
             @click="() => toSelect(item.path)"
             @contextmenu.prevent="() => showContextMenu(item)">

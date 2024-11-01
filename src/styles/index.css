@@ -36,7 +36,7 @@ input:focus, optgroup:focus, select:focus, textarea:focus{
 
 select {
   appearance: none;
-  @apply rounded border-none bg-transparent text-white
+  @apply rounded border-none bg-transparent text-white cursor-pointer
 }
 
 * {
@@ -82,21 +82,15 @@ select {
 }
 
 .select-wrapper{
-  @apply relative flex items-center bg-black bg-opacity-20 text-text
+  @apply relative flex items-center transition-all bg-black bg-opacity-20 hover:bg-opacity-40 text-white rounded [&>select]:(outline-none shadow-none text-sm)
   
 }
 .select-wrapper::after{
-  position: absolute;
-  right: 8px;
+  /* position: absolute; */
   content: '';
   width: 12px;
   height: 12px;
-  background-image: icon('i-md:arrow-drop-down-rounded');
-  background-size: 150%;
-  background-repeat: no-repeat;
-  background-position: center;
-  pointer-events: none;
-  fill: red;
+  @apply i-md:arrow-drop-down-rounded
 }
 
 .sinked{

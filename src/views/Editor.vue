@@ -169,7 +169,7 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
   useSources();
 </script>
 <template>
-  <template v-if="selected">
+  <div v-if="selected" class="w-full h-full overflow-hidden flex flex-col">
     <div class="w-full flex gap-2 p-2 justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]">
       <div class="flex items-center">
         <button
@@ -208,100 +208,109 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
         </button>
       </div>
     </div>
-    <div class="w-full flex-1 overflow-y-auto p-2">
-      <div v-if="!isLoadFailed" class="w-full flex flex-col items-center gap-2 text-sm">
-        <div class="song-form-item">
-          <div>{{ $t("cover:") }}</div>
-          <SingleImagePicker v-model="inner.cover" @change="notifyChange" class="!w-[150px] h-[150px]" />
-        </div>
-        <div class="song-form-item">
-          <div>{{ $t("title:") }}</div>
-          <Tooltip direction="top">
-            <input v-model="inner.title" @change="notifyChange" class="w-full rounded-lg" />
-            <template #tooltip v-if="showHint(inner.title)">
-              <WordSplitter
-                :text="selected.name"
-                @select="
-                  (v) => {
-                    inner.title = (inner.title ?? '') + v;
-                    notifyChange();
-                  }
-                " />
-            </template>
-          </Tooltip>
-        </div>
-        <div class="song-form-item">
-          <div>{{ $t("artist:") }}</div>
-          <Tooltip direction="top">
-            <input v-model="inner.artist" @change="notifyChange" class="w-full rounded-lg" />
-            <template #tooltip v-if="showHint(inner.artist)">
-              <WordSplitter
-                :text="selected.name"
-                @select="
-                  (v) => {
-                    inner.artist = (inner.artist ?? '') + v;
-                    notifyChange();
-                  }
-                " />
-            </template>
-          </Tooltip>
-        </div>
-        <div class="song-form-item">
-          <div>{{ $t("album:") }}</div>
-          <Tooltip direction="top">
-            <input v-model="inner.album" @change="notifyChange" class="w-full rounded-lg" />
-            <template #tooltip v-if="showHint(inner.album)">
-              <WordSplitter
-                :text="selected.name"
-                @select="
-                  (v) => {
-                    inner.album = (inner.album ?? '') + v;
-                    notifyChange();
-                  }
-                " />
-            </template>
-          </Tooltip>
-        </div>
-        <div class="song-form-item">
-          <div>{{ $t("lyrics:") }}</div>
-          <textarea v-model="inner.lyric" @change="notifyChange" class="h-[150px] resize-none rounded-lg" />
-          <div class="flex flex-col items-center gap-2">
-            <button class="button" @click="toSearchLyricOnline">
-              <div class="flex items-center gap-2">
-                {{ $t("search-lyric") }}
-                <div class="i-md:search"></div>
-              </div>
-            </button>
-            <div class="flex items-center gap-2 text-xs">
-              <div>{{ $t("lyric-source") }}</div>
-              <select
-                class="outline-none underline"
-                :value="selectedLyricSource.id"
-                @change="
+    <div class="w-full flex-1 overflow-hidden relative">
+      <Transition name="fade">
+        <div :key="selected.path" class="w-full h-full overflow-y-auto p-2">
+          <div v-if="!isLoadFailed" class="w-full flex flex-col items-center gap-2 text-sm">
+            <div class="song-form-item">
+              <div>{{ $t("cover:") }}</div>
+              <SingleImagePicker
+                v-model="inner.cover"
+                @change="notifyChange"
+                class="!w-[150px] h-[150px] round-lg overflow-hidden" />
+            </div>
+            <div class="song-form-item">
+              <div>{{ $t("title:") }}</div>
+              <Tooltip direction="top">
+                <input v-model="inner.title" @change="notifyChange" class="w-full round-lg" />
+                <template #tooltip v-if="showHint(inner.title)">
+                  <WordSplitter
+                    :text="selected.name"
+                    @select="
+                      (v) => {
+                        inner.title = (inner.title ?? '') + v;
+                        notifyChange();
+                      }
+                    " />
+                </template>
+              </Tooltip>
+            </div>
+            <div class="song-form-item">
+              <div>{{ $t("artist:") }}</div>
+              <Tooltip direction="top">
+                <input v-model="inner.artist" @change="notifyChange" class="w-full round-lg" />
+                <template #tooltip v-if="showHint(inner.artist)">
+                  <WordSplitter
+                    :text="selected.name"
+                    @select="
+                      (v) => {
+                        inner.artist = (inner.artist ?? '') + v;
+                        notifyChange();
+                      }
+                    " />
+                </template>
+              </Tooltip>
+            </div>
+            <div class="song-form-item">
+              <div>{{ $t("album:") }}</div>
+              <Tooltip direction="top">
+                <input v-model="inner.album" @change="notifyChange" class="w-full round-lg" />
+                <template #tooltip v-if="showHint(inner.album)">
+                  <WordSplitter
+                    :text="selected.name"
+                    @select="
+                      (v) => {
+                        inner.album = (inner.album ?? '') + v;
+                        notifyChange();
+                      }
+                    " />
+                </template>
+              </Tooltip>
+            </div>
+            <div class="song-form-item">
+              <div>{{ $t("lyrics:") }}</div>
+              <textarea v-model="inner.lyric" @change="notifyChange" class="h-[150px] resize-none" />
+              <div class="flex flex-col items-center gap-2">
+                <button class="button" @click="toSearchLyricOnline">
+                  <div class="flex items-center gap-2">
+                    {{ $t("search-lyric") }}
+                    <div class="i-md:search"></div>
+                  </div>
+                </button>
+                <div class="flex items-center gap-2 text-xs">
+                  <div>{{ $t("lyric-source") }}</div>
+                  <select
+                    class="outline-none underline"
+                    :value="selectedLyricSource.id"
+                    @change="
             (v) => {
               setSelectedLyricSource((v as any).value);
             }
           ">
-                <option value="" disabled>{{ $t("select") }}</option>
-                <option v-for="source in lyricSources" :key="source.id" :value="source.id">
-                  {{ source.title }}
-                </option>
-              </select>
+                    <option value="" disabled>{{ $t("select") }}</option>
+                    <option v-for="source in lyricSources" :key="source.id" :value="source.id">
+                      {{ source.title }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="song-form-item">
+              <div>{{ $t("comment:") }}</div>
+              <textarea v-model="inner.comment" @change="notifyChange" class="w-full resize-none" />
+              <div class="text-[10px] text-white text-opacity-60">
+                {{ $t("some-source-may-use-comment-to-store-id") }}
+              </div>
             </div>
           </div>
+          <div v-else class="w-full flex-1 flex flex-col justify-center items-center">
+            <div class="i-md:error-outline-rounded w-[32px] h-[32px]"></div>
+            <div>{{ $t("load-music-failed") }}</div>
+          </div>
         </div>
-        <div class="song-form-item">
-          <div>{{ $t("comment:") }}</div>
-          <textarea v-model="inner.comment" @change="notifyChange" class="w-full rounded-lg resize-none" />
-          <div class="text-[10px] text-white text-opacity-60">{{ $t("some-source-may-use-comment-to-store-id") }}</div>
-        </div>
-      </div>
-      <div v-else class="w-full flex-1 flex flex-col justify-center items-center">
-        <div class="i-md:error-outline-rounded w-[32px] h-[32px]"></div>
-        <div>{{ $t("load-music-failed") }}</div>
-      </div>
+      </Transition>
     </div>
-  </template>
+  </div>
   <SourcePop>
     <template #default="binded">
       <Source v-bind="binded" />
@@ -317,12 +326,12 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
 
 <style scoped>
 .song-form-item {
-  @apply w-full flex flex-col justify-center items-center gap-1 [&>:first-child]:(text-white text-opacity-60 text-xs text-right) [&>:nth-child(2)]:(rounded min-w-[150px] w-[50%] max-w[220px]);
+  @apply w-full flex flex-col justify-center items-center gap-1 [&>:first-child]:(text-white text-opacity-60 text-xs text-right) [&>:nth-child(2)]:(rounded-lg min-w-[150px] w-[50%] max-w[220px]);
 }
 
 input,
 textarea {
-  @apply text-center p-1 bg-[rgba(0,0,0,0.1)];
+  @apply text-center p-1 bg-[rgba(0,0,0,0.2)];
 }
 
 .save-button:not(:disabled) {
@@ -331,5 +340,17 @@ textarea {
 .save-button:not(:disabled)::after {
   content: "";
   @apply absolute top-[4px] right-[4px] w-[6px] h-[6px] bg-primary rounded-full;
+}
+</style>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+  position: absolute;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
