@@ -50,5 +50,6 @@
   "no-results": "No results",
   "detail": "Detail",
   "select-words": "select words:",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "language:": "Language:"
 }

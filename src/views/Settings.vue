@@ -1,7 +1,10 @@
 <script lang="ts" setup>
+import useLang from "@/composables/useLang";
 import { OverridesStrategy, ShowInputHint, useSettings } from "@/composables/useStorage";
 
 const { overridesStrategy, showInputHint, reset } = useSettings();
+
+const { locale, options: langs } = useLang();
 
 const toResetSettings = () => {
   reset();
@@ -30,6 +33,15 @@ const version = (window as any).__APP_VERSION__;
             <option disabled>{{ $t("select-an-option") }}</option>
             <option :value="ShowInputHint.Always">{{ $t("always") }}</option>
             <option :value="ShowInputHint.EmptyOnly">{{ $t("empty-only") }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="w-full flex justify-between items-center p-2">
+        <div>{{ $t("language:") }}</div>
+        <div class="select-wrapper">
+          <select v-model="locale" class="px-1 shadow border">
+            <option disabled>{{ $t("select-an-option") }}</option>
+            <option v-for="lang in langs" :key="lang.locale" :value="lang.locale">{{ lang.label }}</option>
           </select>
         </div>
       </div>

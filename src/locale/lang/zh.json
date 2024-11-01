@@ -50,5 +50,6 @@
   "show-input-hint": "展示输入提示",
   "version-version": "版本：{0}",
   "select-words": "选词填入：",
-  "loading": "加载中..."
+  "loading": "加载中...",
+  "language:": "语言："
 }

@@ -1,5 +1,5 @@
 import { load, Store } from "@tauri-apps/plugin-store";
-import { computed, reactive, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 
 const KEY = "__state";
 
@@ -22,12 +22,13 @@ type LinkedValues<T, P extends any[]> = P extends [infer First, ...infer Rest]
 export default function useStorage<State extends object>(key: string, autoSave = true) {
   let store: Store | undefined = undefined;
   const state = reactive({} as Partial<State>);
+
   const loadStore = async () => {
     store = await load(key, { autoSave });
     const localed = await store.get(KEY);
     Object.assign(state, localed);
   };
-  loadStore();
+  const loaded = loadStore();
   watch(state, (newValue) => {
     store?.set(KEY, newValue);
   });
@@ -72,6 +73,7 @@ export default function useStorage<State extends object>(key: string, autoSave =
     state,
     createRef,
     reset,
+    loaded,
   };
 }
 
@@ -92,11 +94,12 @@ export type Settings = {
     showOverrideUnsupportedTagWarning: boolean;
     defaultSourceId: string;
     defaultLyricSourceId: string;
+    lang: string;
   };
   autoFixerSettings: {};
 };
 export const useSettings = (() => {
-  const { createRef, reset } = useStorage<Settings>("settings.json");
+  const { createRef, reset, loaded } = useStorage<Settings>("settings.json");
 
   const overridesStrategy = createRef(
     ["appSettings", "overridesStrategy"],
@@ -109,13 +112,20 @@ export const useSettings = (() => {
     true as boolean
   );
   const defaultSourceId = createRef(["appSettings", "defaultSourceId"], "0" as string);
+
   const defaultLyricSourceId = createRef(["appSettings", "defaultLyricSourceId"], "0" as string);
+
+  const DEFAULT_LANG = navigator.language;
+  const lang = createRef(["appSettings", "lang"], DEFAULT_LANG);
+
   return () => ({
     overridesStrategy,
     showInputHint,
     showOverrideUnsupportedTagWarning,
     defaultSourceId,
     defaultLyricSourceId,
+    lang,
+    loaded,
     reset,
   });
 })();
