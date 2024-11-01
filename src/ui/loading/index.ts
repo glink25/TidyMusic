@@ -12,7 +12,7 @@ export default function createLoadings() {
   const rootRef = ref<HTMLElement>();
   const loadingChildren = ref<LoadingChild[]>([]);
   const LoadingRoot = defineComponent(() => {
-    const getProps = (l: LoadingChild, i: number) => ({
+    const getProps = (l: LoadingChild, _i: number) => ({
       visible: l.value.visible,
       key: l.value.id,
     });

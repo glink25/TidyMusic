@@ -1,6 +1,7 @@
 # TidyMusic
 
 这是一个用于在线匹配音乐metadata标签的软件，使用tauri开发。可以快速查询歌曲标签。
+目前只提供Apple Silicon release，其他系统需要自行打包
 
 # Features
 1. 支持网易云标签源
