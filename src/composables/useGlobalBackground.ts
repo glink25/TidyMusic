@@ -13,8 +13,9 @@ const prefetch = async (src: string) => {
     image.onload = () => {
       res(image);
     };
-    image.onerror = () => {
+    image.onerror = (err) => {
       image.remove();
+      rej(err);
     };
   });
   img.remove();
