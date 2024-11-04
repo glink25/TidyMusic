@@ -1,5 +1,5 @@
 import { CommonTag } from "@/utils/music";
-import { SourceBuilder } from "./helper";
+import { FindSongParams, SourceBuilder } from "./helper";
 
 const search = async (fetcher: typeof fetch, s: string) => {
   // const amu = `https://music.apple.com/cn/search?term=${encodeURIComponent(s)}`;
@@ -44,8 +44,8 @@ const search = async (fetcher: typeof fetch, s: string) => {
 };
 
 export const createAppleMusicSource: SourceBuilder = (fetcher) => {
-  const findSongs = async (params: Partial<CommonTag>) => {
-    const { title, artist } = params;
+  const findSongs = async (params: FindSongParams) => {
+    const { title, artist } = params.tags;
     if (title === undefined && artist === undefined) {
       return [];
     }

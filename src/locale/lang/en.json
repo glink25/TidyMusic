@@ -20,7 +20,7 @@
   "these-tags-will-be-removed-or-replaced": "These tags will be removed or replaced: {0}",
   "save-success": "save success",
   "save-failed-error": "save failed: {0}",
-  "search-online": "search online",
+  "search-online": "search online, enter song title and artist for accurate info",
   "select-default-source": "select default source",
   "title:": "Title:",
   "search-lyric": "search lyric",
@@ -51,5 +51,9 @@
   "detail": "Detail",
   "select-words": "select words:",
   "loading": "Loading...",
-  "language:": "Language:"
+  "language:": "Language:",
+  "search-song-info": "Search Song Info",
+  "lyric:": "Lyric:",
+  "duration-result-song": "duration: {0}",
+  "filename-result-song": "file name: {0}"
 }

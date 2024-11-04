@@ -18,6 +18,9 @@ import { useSources } from "@/composables/useSources";
 import useGlobalBackground from "@/composables/useGlobalBackground";
 import { useI18n } from "vue-i18n";
 import { error, info } from "@/utils/log";
+import { FindSongParams } from "@/sources/helper";
+import { formatSeconds } from "@/utils/time";
+
 const { t } = useI18n();
 const { overridesStrategy, showInputHint, showOverrideUnsupportedTagWarning } = useSettings();
 const showHint = (v: any) => (showInputHint.value === ShowInputHint.Always ? true : v === "" || v === undefined);
@@ -26,14 +29,13 @@ const { selected, beforeSelectChange } = useMusicList();
 let originalTags: Record<string, any> | undefined;
 const getTag = async (v?: Song) => {
   if (!v) return {};
-  const tags = await v.getTags();
-  originalTags = tags;
+  const [tags, fileInfo] = await Promise.all([v.getTags(), v.getFileInfo()]);
   const transformed = Object.fromEntries(tags.map((t) => [t.label, t.value])) as Record<string, any>;
   originalTags = transformed;
-  return transformed;
+  return { tags: transformed, file: fileInfo };
 };
 
-const inner = reactive<Partial<CommonTag>>({});
+const inner = reactive({ tags: {}, file: {} } as FindSongParams);
 const isInnerDirty = ref(false);
 const isLoadFailed = ref(false);
 const notifyChange = () => {
@@ -83,31 +85,31 @@ const isEmpty = (v: any) => {
   );
 };
 
-const [showSourcePop, SourcePop] = usePopcon<Partial<CommonTag>, Partial<CommonTag>>();
+const [showSourcePop, SourcePop] = usePopcon<Partial<CommonTag>, FindSongParams>();
 
 const canSearchOnline = computed(() => !isEmpty(inner));
 const toSearchOnline = async () => {
   if (!canSearchOnline.value) return;
-  const params = inner;
+  const params = inner as FindSongParams;
   const newTag = await showSourcePop(params);
+  console.log("online tag", newTag);
   if (!newTag) {
     return;
   }
-  console.log("online tag", newTag);
   Object.entries(newTag).forEach(<K extends keyof typeof newTag>(p: any) => {
     const [k, v] = p as [K, (typeof newTag)[K]];
-    const old = inner[k];
+    const old = inner.tags[k];
     if (overridesStrategy.value === OverridesStrategy.EmptyOnly) {
       if (old !== undefined || old !== "") {
         return;
       }
     }
-    inner[k] = v;
+    inner.tags[k] = v;
   });
   notifyChange();
 };
 
-const [showLyricSourcePop, LyricSourcePop] = usePopcon<Partial<{ lyric: string }>, Partial<CommonTag>>();
+const [showLyricSourcePop, LyricSourcePop] = usePopcon<Partial<{ lyric: string }>, FindSongParams>();
 
 // const canSearchOnline = computed(() => !isEmpty(inner));
 const toSearchLyricOnline = async () => {
@@ -118,7 +120,7 @@ const toSearchLyricOnline = async () => {
     return;
   }
   console.log("online lyric", newLyric);
-  inner.lyric = newLyric.lyric;
+  inner.tags.lyric = newLyric.lyric;
   notifyChange();
 };
 
@@ -135,7 +137,7 @@ const toSave = async () => {
   if (!song) return;
   loadings.show();
   try {
-    const [canSafeUpdate, next, diffs] = await song.update(inner);
+    const [canSafeUpdate, next, diffs] = await song.update(inner.tags);
     if (!canSafeUpdate && showOverrideUnsupportedTagWarning.value) {
       loadings.dismiss();
       info("diffs:", diffs);
@@ -155,6 +157,7 @@ const toSave = async () => {
     const newBuffer = await next();
     await saveFile(song.path, newBuffer);
     isInnerDirty.value = false;
+    await song.loadTags();
     toasts.success(t("save-success"));
   } catch (err) {
     error(err);
@@ -164,21 +167,22 @@ const toSave = async () => {
   }
 };
 
-useGlobalBackground(() => inner.cover);
+useGlobalBackground(() => inner.tags?.cover);
 const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricSource, setSelectedLyricSource } =
   useSources();
 </script>
 <template>
   <div v-if="selected" class="w-full h-full overflow-hidden flex flex-col">
     <div class="w-full flex gap-2 p-2 justify-between order-2 shadow-[0px_-1px_1px_rgba(0,0,0,0.1)]">
-      <div class="flex items-center">
+      <div class="flex items-center gap-2">
         <button
-          class="icon-button"
+          class="icon-button flex items-center gap-1 !text-opacity-100"
           data-size="large"
           :disabled="!canSearchOnline"
           @click="toSearchOnline"
           :title="$t('search-online')">
           <div class="i-md:screen-search-desktop-outline-rounded"></div>
+          <span class="text-sm">{{ $t("search-song-info") }}</span>
         </button>
         <select
           class="text-xs outline-none underline"
@@ -215,20 +219,24 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
             <div class="song-form-item">
               <div>{{ $t("cover:") }}</div>
               <SingleImagePicker
-                v-model="inner.cover"
+                v-model="inner.tags.cover"
                 @change="notifyChange"
                 class="!w-[150px] h-[150px] round-lg overflow-hidden" />
+            </div>
+            <div class="text-[10px] text-text flex flex-col items-center text-white text-opacity-60">
+              <div>{{ $t("filename-result-song", [inner.file?.name]) }}</div>
+              <div>{{ $t("duration-result-song", [formatSeconds(inner.file?.duration)]) }}</div>
             </div>
             <div class="song-form-item">
               <div>{{ $t("title:") }}</div>
               <Tooltip direction="top">
-                <input v-model="inner.title" @change="notifyChange" class="w-full round-lg" />
-                <template #tooltip v-if="showHint(inner.title)">
+                <input v-model="inner.tags.title" @change="notifyChange" class="w-full round-lg" />
+                <template #tooltip v-if="showHint(inner.tags.title)">
                   <WordSplitter
                     :text="selected.name"
                     @select="
                       (v) => {
-                        inner.title = (inner.title ?? '') + v;
+                        inner.tags.title = (inner.tags.title ?? '') + v;
                         notifyChange();
                       }
                     " />
@@ -238,13 +246,13 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
             <div class="song-form-item">
               <div>{{ $t("artist:") }}</div>
               <Tooltip direction="top">
-                <input v-model="inner.artist" @change="notifyChange" class="w-full round-lg" />
-                <template #tooltip v-if="showHint(inner.artist)">
+                <input v-model="inner.tags.artist" @change="notifyChange" class="w-full round-lg" />
+                <template #tooltip v-if="showHint(inner.tags.artist)">
                   <WordSplitter
                     :text="selected.name"
                     @select="
                       (v) => {
-                        inner.artist = (inner.artist ?? '') + v;
+                        inner.tags.artist = (inner.tags.artist ?? '') + v;
                         notifyChange();
                       }
                     " />
@@ -254,13 +262,13 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
             <div class="song-form-item">
               <div>{{ $t("album:") }}</div>
               <Tooltip direction="top">
-                <input v-model="inner.album" @change="notifyChange" class="w-full round-lg" />
-                <template #tooltip v-if="showHint(inner.album)">
+                <input v-model="inner.tags.album" @change="notifyChange" class="w-full round-lg" />
+                <template #tooltip v-if="showHint(inner.tags.album)">
                   <WordSplitter
                     :text="selected.name"
                     @select="
                       (v) => {
-                        inner.album = (inner.album ?? '') + v;
+                        inner.tags.album = (inner.tags.album ?? '') + v;
                         notifyChange();
                       }
                     " />
@@ -269,7 +277,7 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
             </div>
             <div class="song-form-item">
               <div>{{ $t("lyrics:") }}</div>
-              <textarea v-model="inner.lyric" @change="notifyChange" class="h-[150px] resize-none" />
+              <textarea v-model="inner.tags.lyric" @change="notifyChange" class="h-[150px] resize-none" />
               <div class="flex flex-col items-center gap-2">
                 <button class="button" @click="toSearchLyricOnline">
                   <div class="flex items-center gap-2">
@@ -297,7 +305,7 @@ const { selectedSource, setSelectedSource, sources, lyricSources, selectedLyricS
             </div>
             <div class="song-form-item">
               <div>{{ $t("comment:") }}</div>
-              <textarea v-model="inner.comment" @change="notifyChange" class="w-full resize-none" />
+              <textarea v-model="inner.tags.comment" @change="notifyChange" class="w-full resize-none" />
               <div class="text-[10px] text-white text-opacity-60">
                 {{ $t("some-source-may-use-comment-to-store-id") }}
               </div>

@@ -1,5 +1,5 @@
 import { CommonTag } from "@/utils/music";
-import { SourceBuilder } from "./helper";
+import { FindSongParams, SourceBuilder } from "./helper";
 
 const search = async (fetcher: typeof fetch, s: string) => {
   const resp = await fetcher(
@@ -42,6 +42,9 @@ const search = async (fetcher: typeof fetch, s: string) => {
         genre: "",
         comment: `neteaseId:${song.id}`,
       },
+      file: {
+        duration: song.duration / 1000,
+      },
       more: true,
       id: song.id,
     };
@@ -79,8 +82,8 @@ const getMediaInfo = async (fetcher: typeof fetch, songId: string) => {
 };
 
 export const createNeteaseSource: SourceBuilder = (fetcher) => {
-  const findSongs = async (params: Partial<CommonTag>) => {
-    const { title, artist } = params;
+  const findSongs = async (params: FindSongParams) => {
+    const { title, artist } = params.tags;
     if (title === undefined && artist === undefined) {
       return [];
     }
@@ -97,13 +100,13 @@ export const createNeteaseSource: SourceBuilder = (fetcher) => {
     };
   };
 
-  const findLyrics = async (params: Partial<CommonTag>) => {
+  const findLyrics = async (params: FindSongParams) => {
     const songId = (() => {
-      if (!params.comment) {
+      if (!params.tags.comment) {
         throw new Error("no song id found in comment filed");
       }
       const regex = /neteaseId\s*:\s*([a-zA-Z0-9]+)/;
-      const match = params.comment.match(regex);
+      const match = params.tags.comment.match(regex);
 
       if (match) {
         const neteaseId = match[1];

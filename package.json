@@ -21,6 +21,7 @@
     "@tauri-apps/plugin-store": "~2",
     "@unocss/reset": "^0.63.4",
     "browser-id3-writer": "^6.1.0",
+    "dayjs": "^1.11.13",
     "lodash-es": "^4.17.21",
     "mime-types": "^2.1.35",
     "music-metadata": "^10.5.0",

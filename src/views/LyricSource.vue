@@ -4,9 +4,10 @@ import { CommonTag } from "@/utils/music";
 import { toasts } from "@/composables/useToast";
 import { useSources } from "@/composables/useSources";
 import { useLoading } from "@/composables/useGlobalLoading";
+import { FindSongParams } from "@/sources/helper";
 
 const props = defineProps<{
-  input: Partial<CommonTag>;
+  input: FindSongParams;
   exit: (v: any) => void;
 }>();
 

@@ -1,6 +1,7 @@
 import { ID3Writer } from "browser-id3-writer";
 import { IAudioMetadata, parseBuffer, ITag } from "music-metadata";
 import { CommonTags, CommonTag } from "@/utils/music";
+import { convertFileSrc } from "@tauri-apps/api/core";
 
 export type MusicTags = {
   title: string;
@@ -54,6 +55,31 @@ export default class Song {
     return v;
   }
 
+  private innerFileInfo: { name: string; duration: number } | undefined = undefined;
+  async getFileInfo() {
+    if (this.innerFileInfo) {
+      return this.innerFileInfo;
+    }
+    const src = convertFileSrc(this.path);
+    const audio = document.createElement("audio");
+    await new Promise<void>((res) => {
+      audio.src = src;
+      audio.onloadeddata = () => res();
+      audio.onerror = (err) => {
+        console.error(err);
+        res();
+      };
+      audio.load();
+    });
+    const duration = audio.duration;
+    audio.remove();
+
+    return {
+      name: this.name,
+      duration,
+    };
+  }
+
   async loadTags() {
     await this.getTags();
   }
@@ -103,7 +129,6 @@ export default class Song {
 
       const buffer = writer.addTag();
       this.clearAllCache();
-      await this.loadTags();
       return buffer;
     };
     return [canSafeUpdate, next, diffs] as const;

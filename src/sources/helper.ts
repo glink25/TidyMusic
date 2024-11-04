@@ -1,10 +1,15 @@
 import { CommonTag } from "@/utils/music";
 
-export type FindSongReturned = Record<string, any> & { song: Partial<CommonTag>; more?: boolean };
+export type FindSongReturned = Record<string, any> & {
+  song: Partial<CommonTag>;
+  file?: { duration?: number };
+  more?: boolean;
+};
+export type FindSongParams = { tags: Partial<CommonTag>; file: { name: string; duration?: number } };
 
 export type SourceBuilder = (fetcher: typeof fetch) => {
-  findLyrics?: (tag: Partial<CommonTag>) => Promise<Lyric[]>;
-  findSongs: (tag: Partial<CommonTag>) => Promise<FindSongReturned[]>;
+  findLyrics?: (tag: FindSongParams) => Promise<Lyric[]>;
+  findSongs: (tag: FindSongParams) => Promise<FindSongReturned[]>;
   getMoreDetail?: (info: FindSongReturned) => Promise<Partial<CommonTag>>;
   title: string;
 };

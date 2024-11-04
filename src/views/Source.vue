@@ -3,13 +3,14 @@ import { ref } from "vue";
 import { CommonTag } from "@/utils/music";
 import { toasts } from "@/composables/useToast";
 import { useSources } from "@/composables/useSources";
-import { FindSongReturned } from "@/sources/helper";
+import { FindSongParams, FindSongReturned } from "@/sources/helper";
 import { usePopcon } from "@/ui/popcon";
 import MoreDetail from "@/views/MoreDetail.vue";
 import { useLoading } from "@/composables/useGlobalLoading";
+import { formatSeconds } from "@/utils/time";
 
 const props = defineProps<{
-  input: Partial<CommonTag>;
+  input: FindSongParams;
   exit: (v: Partial<CommonTag>) => void;
 }>();
 
@@ -51,10 +52,11 @@ const toSeeMore = async (result: FindSongReturned) => {
       <template v-if="searchResults?.length">
         <div v-for="(result, index) in searchResults" :key="index" class="flex p-2">
           <div class="flex flex-1 gap-2">
-            <img :src="result.song.cover" width="48" height="48" />
+            <img :src="result.song.cover" width="68" height="68" class="object-contain" />
             <div class="flex flex-col gpa-2">
               <div class="text-sm font-semibold">{{ result.song.title }}</div>
               <div class="flex flex-col text-xs text-text text-opacity-80">
+                <div>{{ $t("duration-result-song", [formatSeconds(result.file?.duration)]) }}</div>
                 <div>{{ $t("artist-result-song-artist", [result.song.artist]) }}</div>
                 <div>{{ $t("album-result-song-album", [result.song.album]) }}</div>
               </div>
