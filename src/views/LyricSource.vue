@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { CommonTag } from "@/utils/music";
 import { toasts } from "@/composables/useToast";
 import { useSources } from "@/composables/useSources";
 import { useLoading } from "@/composables/useGlobalLoading";

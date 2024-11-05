@@ -12,7 +12,7 @@ export function formatSeconds(seconds?: number) {
   const secs = timeDuration.seconds();
 
   return [hours, minutes, secs]
-    .filter((v, i, arr) => {
+    .filter((v, i) => {
       // 移除为0的单位
       if (i === 0) return v !== 0;
       return true;

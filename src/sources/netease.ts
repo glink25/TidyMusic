@@ -1,4 +1,3 @@
-import { CommonTag } from "@/utils/music";
 import { FindSongParams, SourceBuilder } from "./helper";
 
 const search = async (fetcher: typeof fetch, s: string) => {
