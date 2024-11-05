@@ -96,7 +96,7 @@ export type Settings = {
     defaultLyricSourceId: string;
     lang: string;
   };
-  autoFixerSettings: {};
+  autoFixerSettings: any;
 };
 export const useSettings = (() => {
   const { createRef, reset, loaded } = useStorage<Settings>("settings.json");

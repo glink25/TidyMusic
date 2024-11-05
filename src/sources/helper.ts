@@ -1,6 +1,6 @@
 import { CommonTag } from "@/utils/music";
 
-export type FindSongReturned = Record<string, any> & {
+export type FindSongReturned = Record<string, unknown> & {
   song: Partial<CommonTag>;
   file?: { duration?: number };
   more?: boolean;
